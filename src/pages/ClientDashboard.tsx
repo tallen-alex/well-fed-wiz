@@ -173,12 +173,11 @@ export default function ClientDashboard() {
             </p>
 
             <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="grid w-full grid-cols-5 backdrop-blur-sm bg-card/95">
+              <TabsList className="grid w-full grid-cols-4 backdrop-blur-sm bg-card/95">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="profile">Profile</TabsTrigger>
                 <TabsTrigger value="weight">Weight</TabsTrigger>
                 <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
-                <TabsTrigger value="appointments">Appointments</TabsTrigger>
               </TabsList>
 
               <TabsContent value="overview" className="space-y-6 mt-6">
@@ -189,11 +188,14 @@ export default function ClientDashboard() {
                         <Calendar className="mr-2 h-5 w-5 text-primary" />
                         Book Consultation
                       </CardTitle>
-                      <CardDescription>Schedule your next session</CardDescription>
+                      <CardDescription>Schedule your next session with Samira</CardDescription>
                     </CardHeader>
-                    <CardContent className="flex-1 flex items-end">
+                    <CardContent className="flex-1 flex flex-col gap-4">
+                      <div className="flex-1">
+                        <AppointmentsList clientId={user?.id || ""} refresh={appointmentsRefresh} />
+                      </div>
                       <Button className="w-full" onClick={() => setBookingOpen(true)}>
-                        Schedule Appointment
+                        Schedule New Appointment
                       </Button>
                     </CardContent>
                   </Card>
@@ -382,10 +384,6 @@ export default function ClientDashboard() {
                   startWeight={profile.current_weight_kg || undefined}
                   targetWeight={profile.target_weight_kg || undefined}
                 />
-              </TabsContent>
-
-              <TabsContent value="appointments" className="space-y-6 mt-6">
-                <AppointmentsList clientId={user?.id || ""} refresh={appointmentsRefresh} />
               </TabsContent>
 
               <TabsContent value="nutrition" className="mt-6 space-y-6">
