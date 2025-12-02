@@ -4,8 +4,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Mail, Phone, Target, Calendar, UtensilsCrossed } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Mail, Phone, Target, Calendar, UtensilsCrossed, MessageSquare, Edit, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
 
 interface ClientProfile {
@@ -35,7 +42,14 @@ export function ClientProfiles() {
   const [selectedClient, setSelectedClient] = useState<string | null>(null);
   const [clientMealPlans, setClientMealPlans] = useState<MealPlanAssignment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+  const [messageSubject, setMessageSubject] = useState("");
+  const [messageContent, setMessageContent] = useState("");
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [assignmentToDelete, setAssignmentToDelete] = useState<string | null>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchClients();
@@ -127,6 +141,72 @@ export function ClientProfiles() {
     }
   };
 
+  const handleSendMessage = async () => {
+    if (!selectedClient || !messageContent.trim()) return;
+    
+    setSendingMessage(true);
+    try {
+      const { error } = await supabase
+        .from("messages")
+        .insert({
+          sender_id: user?.id,
+          recipient_id: selectedClient,
+          subject: messageSubject.trim() || null,
+          message: messageContent.trim(),
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Message sent",
+        description: "Your message has been sent to the client.",
+      });
+      
+      setMessageDialogOpen(false);
+      setMessageSubject("");
+      setMessageContent("");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to send message",
+        variant: "destructive",
+      });
+    } finally {
+      setSendingMessage(false);
+    }
+  };
+
+  const handleDeleteAssignment = async () => {
+    if (!assignmentToDelete) return;
+
+    try {
+      const { error } = await supabase
+        .from("client_meal_plans")
+        .delete()
+        .eq("id", assignmentToDelete);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Meal plan assignment removed",
+      });
+
+      setDeleteDialogOpen(false);
+      setAssignmentToDelete(null);
+      
+      if (selectedClient) {
+        fetchClientMealPlans(selectedClient);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to remove assignment",
+        variant: "destructive",
+      });
+    }
+  };
+
   const selectedClientData = clients.find((c) => c.id === selectedClient);
 
   if (loading) {
@@ -199,13 +279,19 @@ export function ClientProfiles() {
                     <CardDescription>Client Profile</CardDescription>
                   </div>
                 </div>
+                <Button onClick={() => setMessageDialogOpen(true)} size="sm">
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Send Message
+                </Button>
               </div>
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="info" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="info">Information</TabsTrigger>
-                  <TabsTrigger value="meal-plans">Meal Plans</TabsTrigger>
+                  <TabsTrigger value="meal-plans">
+                    Meal Plans ({clientMealPlans.length})
+                  </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="info" className="space-y-4 mt-4">
@@ -268,9 +354,9 @@ export function ClientProfiles() {
                         <Card key={assignment.id}>
                           <CardContent className="pt-6">
                             <div className="flex items-start justify-between mb-3">
-                              <div className="flex items-start gap-3">
+                              <div className="flex items-start gap-3 flex-1">
                                 <UtensilsCrossed className="h-5 w-5 text-muted-foreground mt-1" />
-                                <div>
+                                <div className="flex-1">
                                   <h4 className="font-semibold">
                                     {assignment.meal_plan.title}
                                   </h4>
@@ -279,15 +365,27 @@ export function ClientProfiles() {
                                   </p>
                                 </div>
                               </div>
-                              <Badge
-                                variant={
-                                  assignment.status === "active"
-                                    ? "default"
-                                    : "secondary"
-                                }
-                              >
-                                {assignment.status}
-                              </Badge>
+                              <div className="flex items-center gap-2">
+                                <Badge
+                                  variant={
+                                    assignment.status === "active"
+                                      ? "default"
+                                      : "secondary"
+                                  }
+                                >
+                                  {assignment.status}
+                                </Badge>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => {
+                                    setAssignmentToDelete(assignment.id);
+                                    setDeleteDialogOpen(true);
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                              </div>
                             </div>
 
                             <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -321,6 +419,71 @@ export function ClientProfiles() {
           </>
         )}
       </Card>
+
+      {/* Message Dialog */}
+      <Dialog open={messageDialogOpen} onOpenChange={setMessageDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Send Message to {selectedClientData?.full_name}</DialogTitle>
+            <DialogDescription>
+              Send a message or note to this client
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="subject">Subject (Optional)</Label>
+              <Input
+                id="subject"
+                value={messageSubject}
+                onChange={(e) => setMessageSubject(e.target.value)}
+                placeholder="Enter subject"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="message">Message</Label>
+              <Textarea
+                id="message"
+                value={messageContent}
+                onChange={(e) => setMessageContent(e.target.value)}
+                placeholder="Type your message..."
+                rows={5}
+                required
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setMessageDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSendMessage}
+                disabled={sendingMessage || !messageContent.trim()}
+              >
+                {sendingMessage ? "Sending..." : "Send Message"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Meal Plan Assignment</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove this meal plan assignment? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setAssignmentToDelete(null)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteAssignment} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
