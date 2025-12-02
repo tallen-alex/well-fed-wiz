@@ -99,21 +99,57 @@ export function WeightJourneyGraph({ targetWeight }: WeightJourneyGraphProps) {
 
   if (weightHistory.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Your Weight Journey 📈</CardTitle>
-          <CardDescription>Start tracking your progress!</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8">
-            <p className="text-muted-foreground mb-4">No weight records yet</p>
-            <Button onClick={() => setAddDialogOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add First Record
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <>
+        <Card>
+          <CardHeader>
+            <CardTitle>Your Weight Journey 📈</CardTitle>
+            <CardDescription>Start tracking your progress!</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-8">
+              <p className="text-muted-foreground mb-4">No weight records yet</p>
+              <Button onClick={() => setAddDialogOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add First Record
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Log Your Weight</DialogTitle>
+              <DialogDescription>
+                Record your current weight to track your progress
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="weight">Weight (kg)</Label>
+                <Input
+                  id="weight"
+                  type="number"
+                  value={newWeight}
+                  onChange={(e) => setNewWeight(e.target.value)}
+                  placeholder="70.5"
+                  step="0.1"
+                  min="20"
+                  max="500"
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setAddDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleAddWeight}>
+                  Save Weight
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </>
     );
   }
 
