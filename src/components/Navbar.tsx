@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Menu, X, LogOut } from "lucide-react";
-import nourishLogo from "@/assets/nourish-logo.png";
+import nourishLogo from "@/assets/logo-option-4.png";
 
 export const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
