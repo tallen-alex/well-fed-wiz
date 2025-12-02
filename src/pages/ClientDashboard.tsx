@@ -386,6 +386,17 @@ export default function ClientDashboard() {
               </TabsContent>
 
               <TabsContent value="nutrition" className="mt-6 space-y-6">
+                <Card className="backdrop-blur-sm bg-card/95">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <UtensilsCrossed className="h-5 w-5 text-primary" />
+                      Today's Nutrition Summary
+                    </CardTitle>
+                    <CardDescription>
+                      Track all meals including those from your meal plan
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
                 <MealLogger onMealLogged={() => setMealRefresh(prev => prev + 1)} />
                 <MealHistory refresh={mealRefresh} />
               </TabsContent>
