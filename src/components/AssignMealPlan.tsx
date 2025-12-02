@@ -106,6 +106,39 @@ export const AssignMealPlan = ({ mealPlanId, open, onOpenChange, onSuccess }: As
 
       if (error) throw error;
 
+      // Send email notification
+      try {
+        // Get client email and meal plan details
+        const { data: clientProfile } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", selectedClientId)
+          .single();
+
+        const { data: authUser } = await supabase.auth.admin.getUserById(selectedClientId);
+        
+        const { data: mealPlan } = await supabase
+          .from("meal_plans")
+          .select("title")
+          .eq("id", mealPlanId)
+          .single();
+
+        if (authUser?.user?.email && mealPlan) {
+          await supabase.functions.invoke("send-meal-plan-notification", {
+            body: {
+              clientEmail: authUser.user.email,
+              clientName: clientProfile?.full_name || "there",
+              mealPlanTitle: mealPlan.title,
+              startDate: format(startDate, "yyyy-MM-dd"),
+              notes: notes || undefined,
+            },
+          });
+        }
+      } catch (emailError) {
+        console.error("Failed to send email notification:", emailError);
+        // Don't fail the whole operation if email fails
+      }
+
       toast({
         title: "Success",
         description: "Meal plan assigned successfully!",

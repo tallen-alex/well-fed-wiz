@@ -2,3 +2,12 @@ project_id = "xkfzbzdnxlkwcxnuvdoz"
 
 [functions.analyze-food-image]
 verify_jwt = true
+
+[functions.send-meal-plan-notification]
+verify_jwt = false
+
+[functions.send-appointment-notification]
+verify_jwt = false
+
+[functions.send-appointment-request-notification]
+verify_jwt = false
