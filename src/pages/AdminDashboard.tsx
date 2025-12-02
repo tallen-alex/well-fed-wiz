@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -16,7 +17,8 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { Navbar } from "@/components/Navbar";
-import { Users, TrendingUp } from "lucide-react";
+import { AdminAppointments } from "@/components/AdminAppointments";
+import { Users, TrendingUp, Calendar } from "lucide-react";
 
 interface Client {
   id: string;
@@ -178,11 +180,28 @@ export default function AdminDashboard() {
             </Card>
           </div>
 
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Client Overview</CardTitle>
-              <CardDescription>All registered clients</CardDescription>
-            </CardHeader>
+          <Tabs defaultValue="appointments" className="mb-8">
+            <TabsList className="grid w-full grid-cols-2 max-w-md">
+              <TabsTrigger value="appointments">
+                <Calendar className="h-4 w-4 mr-2" />
+                Appointments
+              </TabsTrigger>
+              <TabsTrigger value="clients">
+                <Users className="h-4 w-4 mr-2" />
+                Clients
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="appointments" className="mt-6">
+              <AdminAppointments />
+            </TabsContent>
+
+            <TabsContent value="clients">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Client Overview</CardTitle>
+                  <CardDescription>All registered clients</CardDescription>
+                </CardHeader>
             <CardContent>
               {clients.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8">No clients yet</p>
@@ -211,7 +230,9 @@ export default function AdminDashboard() {
                 </Table>
               )}
             </CardContent>
-          </Card>
+              </Card>
+            </TabsContent>
+          </Tabs>
 
           <Card>
             <CardHeader>
