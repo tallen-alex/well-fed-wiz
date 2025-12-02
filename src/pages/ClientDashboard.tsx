@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Navbar } from "@/components/Navbar";
 import { AppointmentBooking } from "@/components/AppointmentBooking";
 import { AppointmentsList } from "@/components/AppointmentsList";
-import { ClientMealPlans } from "@/components/ClientMealPlans";
+import { TodaysMealPlan } from "@/components/TodaysMealPlan";
 import { ClientMessages } from "@/components/ClientMessages";
 import { ClientOnboarding } from "@/components/ClientOnboarding";
 import { WeightJourneyGraph } from "@/components/WeightJourneyGraph";
@@ -168,13 +168,12 @@ export default function ClientDashboard() {
             </p>
 
             <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="grid w-full grid-cols-6 backdrop-blur-sm bg-card/95">
+              <TabsList className="grid w-full grid-cols-5 backdrop-blur-sm bg-card/95">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="profile">Profile</TabsTrigger>
                 <TabsTrigger value="weight">Weight</TabsTrigger>
                 <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
                 <TabsTrigger value="appointments">Appointments</TabsTrigger>
-                <TabsTrigger value="meals">Meals</TabsTrigger>
               </TabsList>
 
               <TabsContent value="overview" className="space-y-6 mt-6">
@@ -381,22 +380,8 @@ export default function ClientDashboard() {
                 <AppointmentsList clientId={user?.id || ""} refresh={appointmentsRefresh} />
               </TabsContent>
 
-              <TabsContent value="meals" className="mt-6">
-                <ClientMealPlans />
-              </TabsContent>
-
               <TabsContent value="nutrition" className="mt-6 space-y-6">
-                <Card className="backdrop-blur-sm bg-card/95">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <UtensilsCrossed className="h-5 w-5 text-primary" />
-                      Today's Nutrition Summary
-                    </CardTitle>
-                    <CardDescription>
-                      Track all meals including those from your meal plan
-                    </CardDescription>
-                  </CardHeader>
-                </Card>
+                <TodaysMealPlan onMealCompleted={() => setMealRefresh(prev => prev + 1)} />
                 <MealLogger onMealLogged={() => setMealRefresh(prev => prev + 1)} />
                 <MealHistory refresh={mealRefresh} />
               </TabsContent>
