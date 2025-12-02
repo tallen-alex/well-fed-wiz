@@ -1,4 +1,5 @@
 import { Heart } from "lucide-react";
+import nourishLogo from "@/assets/nourish-logo.png";
 
 export const Footer = () => {
   return (
@@ -6,9 +7,16 @@ export const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
-            <h3 className="font-outfit font-bold text-xl mb-4 text-foreground">
-              Nourish With Sam
-            </h3>
+            <div className="flex items-center gap-3 mb-4">
+              <img 
+                src={nourishLogo} 
+                alt="Nourish Logo" 
+                className="h-12 w-12" 
+              />
+              <h3 className="font-outfit font-bold text-xl text-foreground">
+                Nourish With Sam
+              </h3>
+            </div>
             <p className="text-muted-foreground">
               Expert nutrition guidance for a healthier, balanced life.
             </p>
