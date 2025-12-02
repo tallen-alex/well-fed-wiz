@@ -207,7 +207,7 @@ export default function ClientDashboard() {
                       </CardTitle>
                       <CardDescription>Chat with Samira</CardDescription>
                     </CardHeader>
-                    <CardContent className="flex-1 flex flex-col">
+                    <CardContent className="flex-1">
                       <ClientMessages />
                     </CardContent>
                   </Card>

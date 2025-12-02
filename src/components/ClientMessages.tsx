@@ -172,9 +172,9 @@ export function ClientMessages() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <>
       {/* Messages List */}
-      <div className="flex-1 overflow-y-auto space-y-3 mb-3 max-h-[200px] pr-2">
+      <div className="flex-1 overflow-y-auto space-y-3 max-h-[200px] pr-2">
         {messages.length === 0 ? (
           <div className="text-center py-8 text-sm text-muted-foreground">
             No messages yet. Send a message to Samira!
@@ -209,7 +209,7 @@ export function ClientMessages() {
       </div>
 
       {/* Message Input */}
-      <form onSubmit={handleSendMessage} className="flex gap-2">
+      <form onSubmit={handleSendMessage} className="flex gap-2 mt-3">
         <Input
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
@@ -226,6 +226,6 @@ export function ClientMessages() {
           <Send className="h-4 w-4" />
         </Button>
       </form>
-    </div>
+    </>
   );
 }
