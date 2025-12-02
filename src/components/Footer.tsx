@@ -1,5 +1,5 @@
 import { Heart } from "lucide-react";
-import nourishLogo from "@/assets/nourish-logo.png";
+import nourishLogo from "@/assets/logo-option-4.png";
 
 export const Footer = () => {
   return (

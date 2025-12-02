@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-nutrition.jpg";
-import nourishLogo from "@/assets/nourish-logo.png";
+import nourishLogo from "@/assets/logo-option-4.png";
 
 export const Hero = () => {
   return (
