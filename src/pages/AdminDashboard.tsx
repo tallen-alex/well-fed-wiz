@@ -21,7 +21,9 @@ import { AdminAppointments } from "@/components/AdminAppointments";
 import { MealPlansList } from "@/components/MealPlansList";
 import { MealPlanEditor } from "@/components/MealPlanEditor";
 import { AssignMealPlan } from "@/components/AssignMealPlan";
-import { Users, TrendingUp, Calendar, UtensilsCrossed } from "lucide-react";
+import { ClientProfiles } from "@/components/ClientProfiles";
+import { MealPlanAssignments } from "@/components/MealPlanAssignments";
+import { Users, TrendingUp, Calendar, UtensilsCrossed, ClipboardList } from "lucide-react";
 
 interface Client {
   id: string;
@@ -188,7 +190,7 @@ export default function AdminDashboard() {
           </div>
 
           <Tabs defaultValue="appointments" className="mb-8">
-            <TabsList className="grid w-full grid-cols-3 max-w-2xl">
+            <TabsList className="grid w-full grid-cols-4 max-w-3xl">
               <TabsTrigger value="appointments">
                 <Calendar className="h-4 w-4 mr-2" />
                 Appointments
@@ -200,6 +202,10 @@ export default function AdminDashboard() {
               <TabsTrigger value="clients">
                 <Users className="h-4 w-4 mr-2" />
                 Clients
+              </TabsTrigger>
+              <TabsTrigger value="assignments">
+                <ClipboardList className="h-4 w-4 mr-2" />
+                Assignments
               </TabsTrigger>
             </TabsList>
             
@@ -225,41 +231,12 @@ export default function AdminDashboard() {
               />
             </TabsContent>
 
-            <TabsContent value="clients">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Client Overview</CardTitle>
-                  <CardDescription>All registered clients</CardDescription>
-                </CardHeader>
-            <CardContent>
-              {clients.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">No clients yet</p>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Dietary Goals</TableHead>
-                      <TableHead>Joined</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {clients.map((client) => (
-                      <TableRow key={client.id}>
-                        <TableCell className="font-medium">{client.full_name || "N/A"}</TableCell>
-                        <TableCell>{client.email}</TableCell>
-                        <TableCell>{client.dietary_goals || "Not set"}</TableCell>
-                        <TableCell>
-                          {new Date(client.created_at).toLocaleDateString()}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </CardContent>
-              </Card>
+            <TabsContent value="clients" className="mt-6">
+              <ClientProfiles />
+            </TabsContent>
+
+            <TabsContent value="assignments" className="mt-6">
+              <MealPlanAssignments />
             </TabsContent>
           </Tabs>
 
