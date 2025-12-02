@@ -60,20 +60,20 @@ export function ClientMessages() {
     try {
       const { data, error } = await supabase
         .from("messages")
-        .select(`
-          id,
-          subject,
-          message,
-          read,
-          created_at,
-          sender:sender_id (
-            full_name:profiles!sender_id(full_name)
-          )
-        `)
+        .select("id, subject, message, read, created_at, sender_id")
         .eq("recipient_id", user?.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
+
+      // Fetch sender profiles separately
+      const senderIds = [...new Set(data?.map(msg => msg.sender_id) || [])];
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", senderIds);
+
+      const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
 
       const formattedMessages = data?.map((msg: any) => ({
         id: msg.id,
@@ -82,7 +82,7 @@ export function ClientMessages() {
         read: msg.read,
         created_at: msg.created_at,
         sender: {
-          full_name: msg.sender?.full_name || "Sam (Nutritionist)",
+          full_name: profileMap.get(msg.sender_id)?.full_name || "Sam (Nutritionist)",
         },
       })) || [];
 
