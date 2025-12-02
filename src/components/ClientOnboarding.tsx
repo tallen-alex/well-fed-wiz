@@ -8,8 +8,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { Sparkles } from "lucide-react";
 import samiraCharacter from "@/assets/samira-character.png";
+import { z } from "zod";
+
+const phoneSchema = z.string().trim().min(10, { message: "Phone number must be at least 10 digits" }).max(15, { message: "Phone number must be less than 15 digits" });
 
 interface OnboardingData {
+  phone: string;
   age: number | null;
   height_cm: number | null;
   current_weight_kg: number | null;
@@ -26,6 +30,7 @@ export function ClientOnboarding({ onComplete }: ClientOnboardingProps) {
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<OnboardingData>({
+    phone: "",
     age: null,
     height_cm: null,
     current_weight_kg: null,
@@ -59,10 +64,21 @@ export function ClientOnboarding({ onComplete }: ClientOnboardingProps) {
   };
 
   const handleComplete = async () => {
-    if (!data.age || !data.height_cm || !data.current_weight_kg || !data.target_weight_kg) {
+    if (!data.phone || !data.age || !data.height_cm || !data.current_weight_kg || !data.target_weight_kg) {
       toast({
         title: "Missing Information",
         description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate phone number
+    const phoneValidation = phoneSchema.safeParse(data.phone);
+    if (!phoneValidation.success) {
+      toast({
+        title: "Validation Error",
+        description: phoneValidation.error.errors[0].message,
         variant: "destructive",
       });
       return;
@@ -73,6 +89,7 @@ export function ClientOnboarding({ onComplete }: ClientOnboardingProps) {
       const { error: profileError } = await supabase
         .from("profiles")
         .update({
+          phone: data.phone,
           age: data.age,
           height_cm: data.height_cm,
           current_weight_kg: data.current_weight_kg,
@@ -136,6 +153,18 @@ export function ClientOnboarding({ onComplete }: ClientOnboardingProps) {
         <CardContent>
           {steps[step].showForm ? (
             <div className="space-y-4 animate-fade-in">
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number *</Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={data.phone}
+                  onChange={(e) => setData({ ...data, phone: e.target.value })}
+                  placeholder="+1 234 567 8900"
+                  required
+                />
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="age">Age *</Label>
