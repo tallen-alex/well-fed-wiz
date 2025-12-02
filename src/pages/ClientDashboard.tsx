@@ -12,7 +12,6 @@ import { Navbar } from "@/components/Navbar";
 import { AppointmentBooking } from "@/components/AppointmentBooking";
 import { AppointmentsList } from "@/components/AppointmentsList";
 import { TodaysMealPlan } from "@/components/TodaysMealPlan";
-import { SendMessage } from "@/components/SendMessage";
 import { ClientMessages } from "@/components/ClientMessages";
 import { ClientOnboarding } from "@/components/ClientOnboarding";
 import { WeightJourneyGraph } from "@/components/WeightJourneyGraph";
@@ -206,13 +205,10 @@ export default function ClientDashboard() {
                         <MessageSquare className="mr-2 h-5 w-5 text-primary" />
                         Messages
                       </CardTitle>
-                      <CardDescription>Check updates from Samira</CardDescription>
+                      <CardDescription>Chat with Samira</CardDescription>
                     </CardHeader>
-                    <CardContent className="flex-1 flex flex-col gap-3">
-                      <div className="flex-1">
-                        <ClientMessages />
-                      </div>
-                      <SendMessage />
+                    <CardContent className="flex-1 flex flex-col">
+                      <ClientMessages />
                     </CardContent>
                   </Card>
                 </div>
