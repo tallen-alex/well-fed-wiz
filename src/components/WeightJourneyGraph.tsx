@@ -198,6 +198,42 @@ export function WeightJourneyGraph({ targetWeight }: WeightJourneyGraphProps) {
   const weightChange = currentWeight - startWeight;
   const isLosing = weightChange < 0;
 
+  // Calculate trend analysis
+  const calculateTrendAnalysis = () => {
+    if (weightHistory.length < 2) return null;
+
+    const firstDate = new Date(weightHistory[0].recorded_date);
+    const lastDate = new Date(weightHistory[weightHistory.length - 1].recorded_date);
+    const daysDiff = Math.max(1, (lastDate.getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24));
+    const weeksDiff = daysDiff / 7;
+    
+    const avgWeeklyChange = weeksDiff > 0 ? weightChange / weeksDiff : 0;
+    
+    // Calculate projected weeks to target
+    let weeksToTarget = null;
+    let projectedDate = null;
+    
+    if (targetWeight && avgWeeklyChange !== 0) {
+      const remainingWeight = currentWeight - targetWeight;
+      weeksToTarget = Math.abs(remainingWeight / avgWeeklyChange);
+      
+      const projectionDate = new Date();
+      projectionDate.setDate(projectionDate.getDate() + (weeksToTarget * 7));
+      projectedDate = projectionDate;
+    }
+    
+    return {
+      avgWeeklyChange,
+      weeksToTarget,
+      projectedDate,
+      isOnTrack: targetWeight ? 
+        (isLosing && currentWeight > targetWeight) || (!isLosing && currentWeight < targetWeight) :
+        null
+    };
+  };
+
+  const trendAnalysis = calculateTrendAnalysis();
+
   return (
     <>
       <Card>
@@ -283,6 +319,72 @@ export function WeightJourneyGraph({ targetWeight }: WeightJourneyGraphProps) {
               </p>
             </div>
           </div>
+
+          {trendAnalysis && (
+            <div className="mt-6 p-4 rounded-lg bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20">
+              <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                <TrendingDown className="h-4 w-4 text-primary" />
+                Trend Analysis
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Average Weekly Change</p>
+                  <p className={`text-xl font-bold ${
+                    trendAnalysis.avgWeeklyChange < 0 ? 'text-green-600' : 
+                    trendAnalysis.avgWeeklyChange > 0 ? 'text-orange-600' : 
+                    'text-muted-foreground'
+                  }`}>
+                    {trendAnalysis.avgWeeklyChange > 0 ? '+' : ''}
+                    {trendAnalysis.avgWeeklyChange.toFixed(2)} kg/week
+                  </p>
+                  {Math.abs(trendAnalysis.avgWeeklyChange) < 0.5 && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Healthy, sustainable pace 👍
+                    </p>
+                  )}
+                  {Math.abs(trendAnalysis.avgWeeklyChange) >= 1 && (
+                    <p className="text-xs text-orange-600 mt-1">
+                      Consider a more gradual approach
+                    </p>
+                  )}
+                </div>
+                
+                {targetWeight && trendAnalysis.weeksToTarget && trendAnalysis.projectedDate && (
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Projected Target Date</p>
+                    <p className="text-xl font-bold text-primary">
+                      {trendAnalysis.weeksToTarget < 1 ? (
+                        "Less than a week! 🎉"
+                      ) : trendAnalysis.weeksToTarget > 100 ? (
+                        "Adjust your plan"
+                      ) : (
+                        format(trendAnalysis.projectedDate, "MMM dd, yyyy")
+                      )}
+                    </p>
+                    {trendAnalysis.weeksToTarget > 0 && trendAnalysis.weeksToTarget <= 100 && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        ~{Math.round(trendAnalysis.weeksToTarget)} weeks at current pace
+                      </p>
+                    )}
+                    {trendAnalysis.isOnTrack === false && (
+                      <p className="text-xs text-orange-600 mt-1">
+                        Current trend is moving away from target
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {!targetWeight && (
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Set a Target</p>
+                    <p className="text-sm text-muted-foreground">
+                      Set your target weight in your profile to see projections
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
