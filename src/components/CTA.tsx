@@ -16,7 +16,7 @@ export const CTA = () => {
             Let's work together to create a personalized nutrition plan that fits your life 
             and helps you achieve your health goals.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex justify-center">
             <Button 
               size="lg"
               variant="secondary"
@@ -27,13 +27,6 @@ export const CTA = () => {
                 <Calendar className="mr-2 h-5 w-5" />
                 Schedule Free Consultation
               </Link>
-            </Button>
-            <Button 
-              size="lg"
-              variant="outline"
-              className="font-outfit text-lg px-8 py-6 rounded-xl border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary"
-            >
-              Download Free Guide
             </Button>
           </div>
         </div>
