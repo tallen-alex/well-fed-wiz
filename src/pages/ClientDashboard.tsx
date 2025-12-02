@@ -15,6 +15,7 @@ import { ClientMealPlans } from "@/components/ClientMealPlans";
 import { ClientMessages } from "@/components/ClientMessages";
 import { ClientOnboarding } from "@/components/ClientOnboarding";
 import { WeightJourneyGraph } from "@/components/WeightJourneyGraph";
+import { AchievementBadges } from "@/components/AchievementBadges";
 import { Calendar, MessageSquare, UtensilsCrossed, User } from "lucide-react";
 import wellnessBackground from "@/assets/wellness-background.jpg";
 
@@ -36,12 +37,29 @@ export default function ClientDashboard() {
     target_weight_kg: null as number | null,
     onboarding_completed: false,
   });
+  const [weightHistory, setWeightHistory] = useState<Array<{ recorded_date: string; weight_kg: number }>>([]);
 
   useEffect(() => {
     if (user) {
       fetchProfile();
+      fetchWeightHistory();
     }
   }, [user]);
+
+  const fetchWeightHistory = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("weight_history")
+        .select("recorded_date, weight_kg")
+        .eq("user_id", user?.id)
+        .order("recorded_date", { ascending: true });
+
+      if (error) throw error;
+      setWeightHistory(data || []);
+    } catch (error: any) {
+      console.error("Failed to load weight history:", error);
+    }
+  };
 
   const fetchProfile = async () => {
     try {
@@ -332,8 +350,16 @@ export default function ClientDashboard() {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="weight" className="mt-6">
-                <WeightJourneyGraph targetWeight={profile.target_weight_kg || undefined} />
+              <TabsContent value="weight" className="mt-6 space-y-6">
+                <WeightJourneyGraph 
+                  targetWeight={profile.target_weight_kg || undefined}
+                  onWeightAdded={fetchWeightHistory}
+                />
+                <AchievementBadges 
+                  weightHistory={weightHistory}
+                  startWeight={profile.current_weight_kg || undefined}
+                  targetWeight={profile.target_weight_kg || undefined}
+                />
               </TabsContent>
 
               <TabsContent value="appointments" className="space-y-6 mt-6">
