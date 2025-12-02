@@ -344,7 +344,7 @@ export default function Auth() {
                     </div>
                     <div className="flex items-center space-x-2 p-3 rounded-lg border border-border hover:bg-accent transition-colors">
                       <RadioGroupItem value="admin" id="admin" />
-                      <Label htmlFor="admin" className="flex-1 cursor-pointer">The Nutritionist (Sam)</Label>
+                      <Label htmlFor="admin" className="flex-1 cursor-pointer">Samira (The Nutritionist)</Label>
                     </div>
                   </RadioGroup>
                 </div>
