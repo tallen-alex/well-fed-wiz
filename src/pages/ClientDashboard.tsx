@@ -143,188 +143,207 @@ export default function ClientDashboard() {
               Here&apos;s your personalized nutrition dashboard
             </p>
 
-            <div className="grid md:grid-cols-2 gap-6 mb-8">
-              <Card className="hover:shadow-lg transition-shadow backdrop-blur-sm bg-card/95">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Calendar className="mr-2 h-5 w-5 text-primary" />
-                    Book Consultation
-                  </CardTitle>
-                  <CardDescription>Schedule your next session with Sam</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button className="w-full" onClick={() => setBookingOpen(true)}>
-                    Schedule Appointment
-                  </Button>
-                </CardContent>
-              </Card>
+            <Tabs defaultValue="overview" className="w-full">
+              <TabsList className="grid w-full grid-cols-5 backdrop-blur-sm bg-card/95">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="profile">Profile</TabsTrigger>
+                <TabsTrigger value="weight">Weight</TabsTrigger>
+                <TabsTrigger value="appointments">Appointments</TabsTrigger>
+                <TabsTrigger value="meals">Meals</TabsTrigger>
+              </TabsList>
 
-              <Card className="hover:shadow-lg transition-shadow backdrop-blur-sm bg-card/95">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <UtensilsCrossed className="mr-2 h-5 w-5 text-primary" />
-                    Meal Plans
-                  </CardTitle>
-                  <CardDescription>View your personalized meal plans</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button variant="outline" className="w-full" asChild>
-                    <a href="#meal-plans">View Meal Plans</a>
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer backdrop-blur-sm bg-card/95">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <MessageSquare className="mr-2 h-5 w-5 text-primary" />
-                    Message Sam
-                  </CardTitle>
-                  <CardDescription>Get answers to your questions</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button variant="outline" className="w-full">Send Message</Button>
-                </CardContent>
-              </Card>
-
-              <Card className="hover:shadow-lg transition-shadow backdrop-blur-sm bg-card/95">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <User className="mr-2 h-5 w-5 text-primary" />
-                    My Profile
-                  </CardTitle>
-                  <CardDescription>Update your information</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button variant="outline" className="w-full" onClick={() => setIsEditing(!isEditing)}>
-                    {isEditing ? "Cancel" : "Edit Profile"}
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="mb-8">
-              <h2 className="font-outfit text-2xl font-bold text-foreground mb-4">
-                Your Weight Journey
-              </h2>
-              <WeightJourneyGraph targetWeight={profile.target_weight_kg || undefined} />
-            </div>
-
-            <div className="mb-8">
-              <h2 className="font-outfit text-2xl font-bold text-foreground mb-4">
-                Your Appointments
-              </h2>
-              <AppointmentsList clientId={user?.id || ""} refresh={appointmentsRefresh} />
-            </div>
-
-            <div className="mb-8">
-              <h2 className="font-outfit text-2xl font-bold text-foreground mb-4">
-                Messages from Your Nutritionist
-              </h2>
-              <ClientMessages />
-            </div>
-
-            <div id="meal-plans" className="mb-8">
-              <h2 className="font-outfit text-2xl font-bold text-foreground mb-4">
-                Your Meal Plans
-              </h2>
-              <ClientMealPlans />
-            </div>
-
-            <Card className="backdrop-blur-sm bg-card/95">
-              <CardHeader>
-                <CardTitle>Your Profile</CardTitle>
-                <CardDescription>
-                  {isEditing ? "Update your information below" : "Your current profile information"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {isEditing ? (
-                  <form onSubmit={handleUpdateProfile} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="full_name">Full Name</Label>
-                        <Input
-                          id="full_name"
-                          value={profile.full_name}
-                          onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-                          required
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="phone">Phone</Label>
-                        <Input
-                          id="phone"
-                          type="tel"
-                          value={profile.phone}
-                          onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                          placeholder="(555) 123-4567"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="dietary_goals">Dietary Goals</Label>
-                      <Textarea
-                        id="dietary_goals"
-                        value={profile.dietary_goals}
-                        onChange={(e) => setProfile({ ...profile, dietary_goals: e.target.value })}
-                        placeholder="Share your health and nutrition goals..."
-                        rows={3}
-                      />
-                    </div>
-
-                    <div className="flex gap-4">
-                      <Button type="submit" disabled={loading}>
-                        {loading ? "Saving..." : "Save Changes"}
+              <TabsContent value="overview" className="space-y-6 mt-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <Card className="hover:shadow-lg transition-shadow backdrop-blur-sm bg-card/95">
+                    <CardHeader>
+                      <CardTitle className="flex items-center">
+                        <Calendar className="mr-2 h-5 w-5 text-primary" />
+                        Book Consultation
+                      </CardTitle>
+                      <CardDescription>Schedule your next session</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Button className="w-full" onClick={() => setBookingOpen(true)}>
+                        Schedule Appointment
                       </Button>
-                      <Button type="button" variant="outline" onClick={() => setIsEditing(false)}>
-                        Cancel
-                      </Button>
-                    </div>
-                  </form>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">Name</p>
-                        <p className="text-foreground">{profile.full_name || "Not set"}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">Phone</p>
-                        <p className="text-foreground">{profile.phone || "Not set"}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-4 gap-4">
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">Age</p>
-                        <p className="text-foreground">{profile.age ? `${profile.age} years` : "Not set"}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">Height</p>
-                        <p className="text-foreground">{profile.height_cm ? `${profile.height_cm} cm` : "Not set"}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">Current Weight</p>
-                        <p className="text-foreground">{profile.current_weight_kg ? `${profile.current_weight_kg} kg` : "Not set"}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">Target Weight</p>
-                        <p className="text-foreground">{profile.target_weight_kg ? `${profile.target_weight_kg} kg` : "Not set"}</p>
-                      </div>
-                    </div>
+                    </CardContent>
+                  </Card>
 
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Dietary Goals</p>
-                      <p className="text-foreground">{profile.dietary_goals || "Not set"}</p>
+                  <Card className="hover:shadow-lg transition-shadow backdrop-blur-sm bg-card/95">
+                    <CardHeader>
+                      <CardTitle className="flex items-center">
+                        <MessageSquare className="mr-2 h-5 w-5 text-primary" />
+                        Messages
+                      </CardTitle>
+                      <CardDescription>Check updates from your nutritionist</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <ClientMessages />
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <Card className="backdrop-blur-sm bg-card/95">
+                  <CardHeader>
+                    <CardTitle>Quick Stats</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="text-center p-4 rounded-lg bg-primary/10">
+                        <p className="text-sm text-muted-foreground mb-1">Current Weight</p>
+                        <p className="text-2xl font-bold text-primary">
+                          {profile.current_weight_kg ? `${profile.current_weight_kg} kg` : "—"}
+                        </p>
+                      </div>
+                      <div className="text-center p-4 rounded-lg bg-muted">
+                        <p className="text-sm text-muted-foreground mb-1">Target Weight</p>
+                        <p className="text-2xl font-bold">
+                          {profile.target_weight_kg ? `${profile.target_weight_kg} kg` : "—"}
+                        </p>
+                      </div>
+                      <div className="text-center p-4 rounded-lg bg-muted">
+                        <p className="text-sm text-muted-foreground mb-1">BMI</p>
+                        <p className="text-2xl font-bold">
+                          {profile.height_cm && profile.current_weight_kg 
+                            ? (profile.current_weight_kg / Math.pow(profile.height_cm / 100, 2)).toFixed(1)
+                            : "—"}
+                        </p>
+                      </div>
+                      <div className="text-center p-4 rounded-lg bg-muted">
+                        <p className="text-sm text-muted-foreground mb-1">Height</p>
+                        <p className="text-2xl font-bold">
+                          {profile.height_cm ? `${profile.height_cm} cm` : "—"}
+                        </p>
+                      </div>
                     </div>
-                    <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="profile" className="mt-6">
+                <Card className="backdrop-blur-sm bg-card/95">
+                  <CardHeader>
+                    <CardTitle>Your Profile</CardTitle>
+                    <CardDescription>
+                      {isEditing ? "Update your information below" : "Your current profile information"}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {isEditing ? (
+                      <form onSubmit={handleUpdateProfile} className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="full_name">Full Name</Label>
+                            <Input
+                              id="full_name"
+                              value={profile.full_name}
+                              onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
+                              required
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="phone">Phone</Label>
+                            <Input
+                              id="phone"
+                              type="tel"
+                              value={profile.phone}
+                              onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                              placeholder="(555) 123-4567"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="dietary_goals">Dietary Goals</Label>
+                          <Textarea
+                            id="dietary_goals"
+                            value={profile.dietary_goals}
+                            onChange={(e) => setProfile({ ...profile, dietary_goals: e.target.value })}
+                            placeholder="Share your health and nutrition goals..."
+                            rows={3}
+                          />
+                        </div>
+
+                        <div className="flex gap-4">
+                          <Button type="submit" disabled={loading}>
+                            {loading ? "Saving..." : "Save Changes"}
+                          </Button>
+                          <Button type="button" variant="outline" onClick={() => setIsEditing(false)}>
+                            Cancel
+                          </Button>
+                        </div>
+                      </form>
+                    ) : (
+                      <div className="space-y-6">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground">Name</p>
+                            <p className="text-foreground">{profile.full_name || "Not set"}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground">Phone</p>
+                            <p className="text-foreground">{profile.phone || "Not set"}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
+                          <h3 className="font-semibold mb-3 text-foreground">Health Metrics</h3>
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div>
+                              <p className="text-sm font-medium text-muted-foreground">Age</p>
+                              <p className="text-foreground font-semibold">{profile.age ? `${profile.age} years` : "Not set"}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-muted-foreground">Height</p>
+                              <p className="text-foreground font-semibold">{profile.height_cm ? `${profile.height_cm} cm` : "Not set"}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-muted-foreground">Current Weight</p>
+                              <p className="text-foreground font-semibold">{profile.current_weight_kg ? `${profile.current_weight_kg} kg` : "Not set"}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-muted-foreground">Target Weight</p>
+                              <p className="text-foreground font-semibold">{profile.target_weight_kg ? `${profile.target_weight_kg} kg` : "Not set"}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-muted-foreground">BMI</p>
+                              <p className="text-foreground font-semibold">
+                                {profile.height_cm && profile.current_weight_kg 
+                                  ? (() => {
+                                      const bmi = profile.current_weight_kg / Math.pow(profile.height_cm / 100, 2);
+                                      const category = bmi < 18.5 ? "Underweight" : bmi < 25 ? "Normal" : bmi < 30 ? "Overweight" : "Obese";
+                                      return `${bmi.toFixed(1)} (${category})`;
+                                    })()
+                                  : "Not set"}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Dietary Goals</p>
+                          <p className="text-foreground">{profile.dietary_goals || "Not set"}</p>
+                        </div>
+                        <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="weight" className="mt-6">
+                <WeightJourneyGraph targetWeight={profile.target_weight_kg || undefined} />
+              </TabsContent>
+
+              <TabsContent value="appointments" className="space-y-6 mt-6">
+                <AppointmentsList clientId={user?.id || ""} refresh={appointmentsRefresh} />
+              </TabsContent>
+
+              <TabsContent value="meals" className="mt-6">
+                <ClientMealPlans />
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </div>
