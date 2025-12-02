@@ -8,6 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Navbar } from "@/components/Navbar";
+import { AppointmentBooking } from "@/components/AppointmentBooking";
+import { AppointmentsList } from "@/components/AppointmentsList";
 import { Calendar, MessageSquare, UtensilsCrossed, User } from "lucide-react";
 
 export default function ClientDashboard() {
@@ -15,6 +17,8 @@ export default function ClientDashboard() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [bookingOpen, setBookingOpen] = useState(false);
+  const [appointmentsRefresh, setAppointmentsRefresh] = useState(0);
   const [profile, setProfile] = useState({
     full_name: "",
     phone: "",
@@ -99,7 +103,7 @@ export default function ClientDashboard() {
           </p>
 
           <div className="grid md:grid-cols-2 gap-6 mb-8">
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <Card className="hover:shadow-lg transition-shadow">
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Calendar className="mr-2 h-5 w-5 text-primary" />
@@ -108,7 +112,9 @@ export default function ClientDashboard() {
                 <CardDescription>Schedule your next session with Sam</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="w-full">Schedule Appointment</Button>
+                <Button className="w-full" onClick={() => setBookingOpen(true)}>
+                  Schedule Appointment
+                </Button>
               </CardContent>
             </Card>
 
@@ -152,6 +158,13 @@ export default function ClientDashboard() {
                 </Button>
               </CardContent>
             </Card>
+          </div>
+
+          <div className="mb-8">
+            <h2 className="font-outfit text-2xl font-bold text-foreground mb-4">
+              Your Appointments
+            </h2>
+            <AppointmentsList clientId={user?.id || ""} refresh={appointmentsRefresh} />
           </div>
 
           <Card>
@@ -231,6 +244,12 @@ export default function ClientDashboard() {
               )}
             </CardContent>
           </Card>
+
+          <AppointmentBooking
+            open={bookingOpen}
+            onOpenChange={setBookingOpen}
+            onSuccess={() => setAppointmentsRefresh(prev => prev + 1)}
+          />
         </div>
       </div>
     </div>
