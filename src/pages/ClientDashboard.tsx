@@ -16,6 +16,7 @@ import { ClientMessages } from "@/components/ClientMessages";
 import { ClientOnboarding } from "@/components/ClientOnboarding";
 import { WeightJourneyGraph } from "@/components/WeightJourneyGraph";
 import { AchievementBadges } from "@/components/AchievementBadges";
+import { GoalComparisonChart } from "@/components/GoalComparisonChart";
 import { Calendar, MessageSquare, UtensilsCrossed, User } from "lucide-react";
 import wellnessBackground from "@/assets/wellness-background.jpg";
 
@@ -354,6 +355,11 @@ export default function ClientDashboard() {
                 <WeightJourneyGraph 
                   targetWeight={profile.target_weight_kg || undefined}
                   onWeightAdded={fetchWeightHistory}
+                />
+                <GoalComparisonChart
+                  weightHistory={weightHistory}
+                  startWeight={weightHistory.length > 0 ? weightHistory[0].weight_kg : profile.current_weight_kg || undefined}
+                  targetWeight={profile.target_weight_kg || undefined}
                 />
                 <AchievementBadges 
                   weightHistory={weightHistory}
