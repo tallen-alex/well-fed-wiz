@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-nutrition.jpg";
+import nourishLogo from "@/assets/nourish-logo.png";
 
 export const Hero = () => {
   return (
@@ -13,6 +14,14 @@ export const Hero = () => {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
+      />
+      
+      {/* Subtle logo watermark */}
+      <img
+        src={nourishLogo}
+        alt=""
+        className="absolute right-0 top-1/2 -translate-y-1/2 w-[500px] md:w-[700px] opacity-[0.08] z-0 pointer-events-none"
+        aria-hidden="true"
       />
       
       <div className="container mx-auto px-4 relative z-10">
