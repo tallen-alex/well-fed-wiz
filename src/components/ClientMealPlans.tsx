@@ -5,9 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
-import { Calendar, ChefHat, Clock, UtensilsCrossed } from "lucide-react";
+import { format, addDays } from "date-fns";
+import { Calendar, ChefHat, Clock, UtensilsCrossed, CheckCircle2 } from "lucide-react";
 
 interface MealPlanAssignment {
   id: string;
@@ -27,6 +28,7 @@ interface MealPlanDay {
   day_number: number;
   notes: string | null;
   meal_plan_meals: Array<{
+    id: string;
     meal_type: string;
     meal_name: string;
     description: string | null;
@@ -47,6 +49,7 @@ export const ClientMealPlans = () => {
   const [selectedPlanDays, setSelectedPlanDays] = useState<MealPlanDay[]>([]);
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [currentDay, setCurrentDay] = useState(1);
+  const [completedMeals, setCompletedMeals] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (user) {
@@ -79,6 +82,7 @@ export const ClientMealPlans = () => {
 
       if (data && data.length > 0) {
         loadMealPlanDays(data[0].meal_plans.id);
+        fetchCompletedMeals(data[0].start_date, data[0].meal_plans.duration_days);
       }
     } catch (error: any) {
       console.error("Error fetching meal plans:", error);
@@ -103,6 +107,7 @@ export const ClientMealPlans = () => {
           day_number,
           notes,
           meal_plan_meals (
+            id,
             meal_type,
             meal_name,
             description,
@@ -124,6 +129,92 @@ export const ClientMealPlans = () => {
       toast({
         title: "Error",
         description: "Failed to load meal plan details",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const fetchCompletedMeals = async (startDate: string, durationDays: number) => {
+    try {
+      const endDate = format(addDays(new Date(startDate), durationDays - 1), "yyyy-MM-dd");
+      
+      const { data, error } = await supabase
+        .from("meal_logs")
+        .select("meal_name, logged_date, meal_type")
+        .eq("user_id", user?.id)
+        .gte("logged_date", startDate)
+        .lte("logged_date", endDate);
+
+      if (error) throw error;
+
+      const completed = new Set(
+        (data || []).map((log) => `${log.logged_date}_${log.meal_type}_${log.meal_name}`)
+      );
+      setCompletedMeals(completed);
+    } catch (error: any) {
+      console.error("Error fetching completed meals:", error);
+    }
+  };
+
+  const toggleMealCompletion = async (
+    meal: MealPlanDay["meal_plan_meals"][0],
+    dayNumber: number,
+    startDate: string
+  ) => {
+    try {
+      const mealDate = format(addDays(new Date(startDate), dayNumber - 1), "yyyy-MM-dd");
+      const key = `${mealDate}_${meal.meal_type}_${meal.meal_name}`;
+
+      if (completedMeals.has(key)) {
+        // Remove completion
+        const { error } = await supabase
+          .from("meal_logs")
+          .delete()
+          .eq("user_id", user?.id)
+          .eq("logged_date", mealDate)
+          .eq("meal_type", meal.meal_type)
+          .eq("meal_name", meal.meal_name);
+
+        if (error) throw error;
+
+        const newCompleted = new Set(completedMeals);
+        newCompleted.delete(key);
+        setCompletedMeals(newCompleted);
+
+        toast({
+          title: "Meal unmarked",
+          description: "Meal removed from completed list",
+        });
+      } else {
+        // Mark as completed
+        const { error } = await supabase.from("meal_logs").insert({
+          user_id: user?.id,
+          meal_name: meal.meal_name,
+          meal_type: meal.meal_type,
+          calories: meal.calories,
+          protein_grams: meal.protein_grams,
+          carbs_grams: meal.carbs_grams,
+          fat_grams: meal.fat_grams,
+          logged_date: mealDate,
+          logged_time: format(new Date(), "HH:mm:ss"),
+          notes: "Completed from meal plan",
+        });
+
+        if (error) throw error;
+
+        const newCompleted = new Set(completedMeals);
+        newCompleted.add(key);
+        setCompletedMeals(newCompleted);
+
+        toast({
+          title: "Great job! 🎉",
+          description: `${meal.meal_name} marked as completed`,
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update meal completion",
         variant: "destructive",
       });
     }
@@ -214,18 +305,31 @@ export const ClientMealPlans = () => {
                 </Card>
               ) : (
                 <div className="space-y-4">
-                  {day.meal_plan_meals.map((meal, index) => (
-                    <Card key={index}>
-                      <CardHeader className="pb-3">
-                        <div className="flex items-center gap-2">
-                          <ChefHat className="h-5 w-5 text-primary" />
-                          <CardTitle className="text-lg capitalize">{meal.meal_type}</CardTitle>
-                        </div>
-                        <CardDescription className="text-base font-medium">
-                          {meal.meal_name}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-3">
+                  {day.meal_plan_meals.map((meal, index) => {
+                    const mealDate = format(addDays(new Date(activePlan.start_date), day.day_number - 1), "yyyy-MM-dd");
+                    const isCompleted = completedMeals.has(`${mealDate}_${meal.meal_type}_${meal.meal_name}`);
+                    
+                    return (
+                      <Card key={index} className={isCompleted ? "bg-primary/5 border-primary/30" : ""}>
+                        <CardHeader className="pb-3">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <Checkbox
+                                checked={isCompleted}
+                                onCheckedChange={() => toggleMealCompletion(meal, day.day_number, activePlan.start_date)}
+                              />
+                              <div className="flex items-center gap-2">
+                                <ChefHat className="h-5 w-5 text-primary" />
+                                <CardTitle className="text-lg capitalize">{meal.meal_type}</CardTitle>
+                              </div>
+                            </div>
+                            {isCompleted && <CheckCircle2 className="h-5 w-5 text-primary" />}
+                          </div>
+                          <CardDescription className="text-base font-medium ml-9">
+                            {meal.meal_name}
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-3 ml-9">
                         {meal.description && (
                           <p className="text-sm text-muted-foreground">{meal.description}</p>
                         )}
@@ -272,9 +376,10 @@ export const ClientMealPlans = () => {
                             </div>
                           </div>
                         )}
-                      </CardContent>
-                    </Card>
-                  ))}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
                 </div>
               )}
             </TabsContent>
