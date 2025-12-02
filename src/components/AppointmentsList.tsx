@@ -127,19 +127,62 @@ export const AppointmentsList = ({ clientId, refresh }: AppointmentsListProps) =
     setRescheduleLoading(true);
 
     try {
+      const wasConfirmed = selectedAppointment.status === "confirmed";
+      
       const { error } = await supabase
         .from("appointments")
         .update({
           appointment_date: format(newDate, "yyyy-MM-dd"),
           appointment_time: newTime,
+          status: wasConfirmed ? "pending" : selectedAppointment.status,
         })
         .eq("id", selectedAppointment.id);
 
       if (error) throw error;
 
+      // Send email notification to admin if it was a confirmed appointment
+      if (wasConfirmed) {
+        try {
+          const { data: adminRole } = await supabase
+            .from("user_roles")
+            .select("user_id")
+            .eq("role", "admin")
+            .limit(1)
+            .single();
+
+          const { data: clientProfile } = await supabase
+            .from("profiles")
+            .select("full_name")
+            .eq("id", clientId)
+            .single();
+
+          if (adminRole?.user_id) {
+            const { data: adminUser } = await supabase.auth.admin.getUserById(adminRole.user_id);
+            const { data: clientUser } = await supabase.auth.admin.getUserById(clientId);
+            
+            if (adminUser?.user?.email) {
+              await supabase.functions.invoke("send-appointment-request-notification", {
+                body: {
+                  adminEmail: adminUser.user.email,
+                  clientName: clientProfile?.full_name || "A client",
+                  clientEmail: clientUser?.user?.email || "",
+                  appointmentDate: format(newDate, "yyyy-MM-dd"),
+                  appointmentTime: newTime,
+                  clientNotes: `Rescheduled from ${format(new Date(selectedAppointment.appointment_date), "MMM d, yyyy")} at ${selectedAppointment.appointment_time}`,
+                },
+              });
+            }
+          }
+        } catch (emailError) {
+          console.error("Failed to send email notification:", emailError);
+        }
+      }
+
       toast({
         title: "Appointment Rescheduled",
-        description: "Your appointment has been updated. Samira will be notified.",
+        description: wasConfirmed 
+          ? "Your appointment has been rescheduled and is pending confirmation from Samira."
+          : "Your appointment has been updated. Samira will be notified.",
       });
 
       setRescheduleDialogOpen(false);
@@ -219,7 +262,7 @@ export const AppointmentsList = ({ clientId, refresh }: AppointmentsListProps) =
                 </div>
               )}
 
-              {appointment.status === "pending" && (
+              {(appointment.status === "pending" || appointment.status === "confirmed") && (
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
@@ -252,7 +295,9 @@ export const AppointmentsList = ({ clientId, refresh }: AppointmentsListProps) =
           <DialogHeader>
             <DialogTitle>Reschedule Appointment</DialogTitle>
             <DialogDescription>
-              Select a new date and time for your consultation with Samira
+              {selectedAppointment?.status === "confirmed" 
+                ? "Rescheduling a confirmed appointment will require Samira's approval again."
+                : "Select a new date and time for your consultation with Samira"}
             </DialogDescription>
           </DialogHeader>
 
