@@ -6,10 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { useToast } from "@/hooks/use-toast";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { format } from "date-fns";
-import { TrendingDown, TrendingUp, Plus } from "lucide-react";
+import { TrendingDown, TrendingUp, Plus, CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface WeightRecord {
   recorded_date: string;
@@ -27,6 +30,7 @@ export function WeightJourneyGraph({ targetWeight }: WeightJourneyGraphProps) {
   const [loading, setLoading] = useState(true);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [newWeight, setNewWeight] = useState("");
+  const [recordDate, setRecordDate] = useState<Date>(new Date());
 
   useEffect(() => {
     if (user) {
@@ -72,6 +76,7 @@ export function WeightJourneyGraph({ targetWeight }: WeightJourneyGraphProps) {
         .insert({
           user_id: user?.id,
           weight_kg: weight,
+          recorded_date: format(recordDate, "yyyy-MM-dd"),
         });
 
       if (error) throw error;
@@ -83,6 +88,7 @@ export function WeightJourneyGraph({ targetWeight }: WeightJourneyGraphProps) {
 
       setAddDialogOpen(false);
       setNewWeight("");
+      setRecordDate(new Date());
       fetchWeightHistory();
     } catch (error: any) {
       toast({
@@ -126,9 +132,9 @@ export function WeightJourneyGraph({ targetWeight }: WeightJourneyGraphProps) {
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="weight">Weight (kg)</Label>
+                <Label htmlFor="weight-empty">Weight (kg)</Label>
                 <Input
-                  id="weight"
+                  id="weight-empty"
                   type="number"
                   value={newWeight}
                   onChange={(e) => setNewWeight(e.target.value)}
@@ -138,6 +144,35 @@ export function WeightJourneyGraph({ targetWeight }: WeightJourneyGraphProps) {
                   max="500"
                 />
               </div>
+              
+              <div className="space-y-2">
+                <Label>Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !recordDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {recordDate ? format(recordDate, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={recordDate}
+                      onSelect={(date) => date && setRecordDate(date)}
+                      disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
               <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={() => setAddDialogOpen(false)}>
                   Cancel
@@ -273,6 +308,35 @@ export function WeightJourneyGraph({ targetWeight }: WeightJourneyGraphProps) {
                 max="500"
               />
             </div>
+            
+            <div className="space-y-2">
+              <Label>Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !recordDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {recordDate ? format(recordDate, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={recordDate}
+                    onSelect={(date) => date && setRecordDate(date)}
+                    disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
+                    initialFocus
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setAddDialogOpen(false)}>
                 Cancel
