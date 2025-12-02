@@ -10,24 +10,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, X, LogOut, LayoutDashboard } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
 
 export const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, role, signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
     await signOut();
     navigate("/");
-  };
-
-  const handleDashboard = () => {
-    if (role === "admin") {
-      navigate("/admin-dashboard");
-    } else {
-      navigate("/client-dashboard");
-    }
   };
 
   const getInitials = (name?: string) => {
@@ -85,10 +77,6 @@ export const Navbar = () => {
                     <p className="text-xs text-muted-foreground">{user.email}</p>
                   </div>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleDashboard} className="cursor-pointer">
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    Dashboard
-                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-destructive">
                     <LogOut className="mr-2 h-4 w-4" />
                     Sign Out
@@ -141,10 +129,6 @@ export const Navbar = () => {
                   <p className="text-sm font-medium text-foreground">
                     {user.user_metadata?.full_name || "User"}
                   </p>
-                  <Button onClick={handleDashboard} variant="outline" className="w-full justify-start">
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    Dashboard
-                  </Button>
                   <Button onClick={handleSignOut} variant="outline" className="w-full justify-start text-destructive">
                     <LogOut className="mr-2 h-4 w-4" />
                     Sign Out
