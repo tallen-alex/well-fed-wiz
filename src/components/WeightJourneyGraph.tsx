@@ -21,9 +21,10 @@ interface WeightRecord {
 
 interface WeightJourneyGraphProps {
   targetWeight?: number;
+  onWeightAdded?: () => void;
 }
 
-export function WeightJourneyGraph({ targetWeight }: WeightJourneyGraphProps) {
+export function WeightJourneyGraph({ targetWeight, onWeightAdded }: WeightJourneyGraphProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const [weightHistory, setWeightHistory] = useState<WeightRecord[]>([]);
@@ -90,6 +91,7 @@ export function WeightJourneyGraph({ targetWeight }: WeightJourneyGraphProps) {
       setNewWeight("");
       setRecordDate(new Date());
       fetchWeightHistory();
+      onWeightAdded?.();
     } catch (error: any) {
       toast({
         title: "Error",
