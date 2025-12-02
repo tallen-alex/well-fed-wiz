@@ -253,34 +253,49 @@ export type Database = {
       }
       profiles: {
         Row: {
+          age: number | null
           avatar_url: string | null
           bio: string | null
           created_at: string | null
           credentials: string | null
+          current_weight_kg: number | null
           dietary_goals: string | null
           full_name: string | null
+          height_cm: number | null
           id: string
+          onboarding_completed: boolean
           phone: string | null
+          target_weight_kg: number | null
         }
         Insert: {
+          age?: number | null
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
           credentials?: string | null
+          current_weight_kg?: number | null
           dietary_goals?: string | null
           full_name?: string | null
+          height_cm?: number | null
           id: string
+          onboarding_completed?: boolean
           phone?: string | null
+          target_weight_kg?: number | null
         }
         Update: {
+          age?: number | null
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
           credentials?: string | null
+          current_weight_kg?: number | null
           dietary_goals?: string | null
           full_name?: string | null
+          height_cm?: number | null
           id?: string
+          onboarding_completed?: boolean
           phone?: string | null
+          target_weight_kg?: number | null
         }
         Relationships: []
       }
@@ -299,6 +314,33 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      weight_history: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          recorded_date: string
+          user_id: string
+          weight_kg: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          recorded_date?: string
+          user_id: string
+          weight_kg: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          recorded_date?: string
+          user_id?: string
+          weight_kg?: number
         }
         Relationships: []
       }
