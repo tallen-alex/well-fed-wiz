@@ -17,6 +17,8 @@ import { ClientOnboarding } from "@/components/ClientOnboarding";
 import { WeightJourneyGraph } from "@/components/WeightJourneyGraph";
 import { AchievementBadges } from "@/components/AchievementBadges";
 import { GoalComparisonChart } from "@/components/GoalComparisonChart";
+import { MealLogger } from "@/components/MealLogger";
+import { MealHistory } from "@/components/MealHistory";
 import { Calendar, MessageSquare, UtensilsCrossed, User } from "lucide-react";
 import wellnessBackground from "@/assets/wellness-background.jpg";
 
@@ -40,6 +42,7 @@ export default function ClientDashboard() {
     onboarding_completed: false,
   });
   const [weightHistory, setWeightHistory] = useState<Array<{ recorded_date: string; weight_kg: number }>>([]);
+  const [mealRefresh, setMealRefresh] = useState(0);
 
   useEffect(() => {
     if (user) {
@@ -165,10 +168,11 @@ export default function ClientDashboard() {
             </p>
 
             <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="grid w-full grid-cols-5 backdrop-blur-sm bg-card/95">
+              <TabsList className="grid w-full grid-cols-6 backdrop-blur-sm bg-card/95">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="profile">Profile</TabsTrigger>
                 <TabsTrigger value="weight">Weight</TabsTrigger>
+                <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
                 <TabsTrigger value="appointments">Appointments</TabsTrigger>
                 <TabsTrigger value="meals">Meals</TabsTrigger>
               </TabsList>
@@ -379,6 +383,11 @@ export default function ClientDashboard() {
 
               <TabsContent value="meals" className="mt-6">
                 <ClientMealPlans />
+              </TabsContent>
+
+              <TabsContent value="nutrition" className="mt-6 space-y-6">
+                <MealLogger onMealLogged={() => setMealRefresh(prev => prev + 1)} />
+                <MealHistory refresh={mealRefresh} />
               </TabsContent>
             </Tabs>
           </div>

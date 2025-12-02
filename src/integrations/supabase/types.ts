@@ -100,6 +100,93 @@ export type Database = {
           },
         ]
       }
+      indian_foods: {
+        Row: {
+          calories_per_100g: number
+          carbs_per_100g: number | null
+          category: string
+          common_serving_calories: number | null
+          common_serving_size: string | null
+          created_at: string
+          fat_per_100g: number | null
+          food_name: string
+          id: string
+          protein_per_100g: number | null
+        }
+        Insert: {
+          calories_per_100g: number
+          carbs_per_100g?: number | null
+          category: string
+          common_serving_calories?: number | null
+          common_serving_size?: string | null
+          created_at?: string
+          fat_per_100g?: number | null
+          food_name: string
+          id?: string
+          protein_per_100g?: number | null
+        }
+        Update: {
+          calories_per_100g?: number
+          carbs_per_100g?: number | null
+          category?: string
+          common_serving_calories?: number | null
+          common_serving_size?: string | null
+          created_at?: string
+          fat_per_100g?: number | null
+          food_name?: string
+          id?: string
+          protein_per_100g?: number | null
+        }
+        Relationships: []
+      }
+      meal_logs: {
+        Row: {
+          calories: number | null
+          carbs_grams: number | null
+          created_at: string
+          fat_grams: number | null
+          id: string
+          logged_date: string
+          logged_time: string
+          meal_name: string
+          meal_type: string
+          notes: string | null
+          photo_url: string | null
+          protein_grams: number | null
+          user_id: string
+        }
+        Insert: {
+          calories?: number | null
+          carbs_grams?: number | null
+          created_at?: string
+          fat_grams?: number | null
+          id?: string
+          logged_date?: string
+          logged_time?: string
+          meal_name: string
+          meal_type: string
+          notes?: string | null
+          photo_url?: string | null
+          protein_grams?: number | null
+          user_id: string
+        }
+        Update: {
+          calories?: number | null
+          carbs_grams?: number | null
+          created_at?: string
+          fat_grams?: number | null
+          id?: string
+          logged_date?: string
+          logged_time?: string
+          meal_name?: string
+          meal_type?: string
+          notes?: string | null
+          photo_url?: string | null
+          protein_grams?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       meal_plan_days: {
         Row: {
           created_at: string | null
