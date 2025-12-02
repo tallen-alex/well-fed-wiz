@@ -265,6 +265,7 @@ export type Database = {
           id: string
           onboarding_completed: boolean
           phone: string | null
+          target_date: string | null
           target_weight_kg: number | null
         }
         Insert: {
@@ -280,6 +281,7 @@ export type Database = {
           id: string
           onboarding_completed?: boolean
           phone?: string | null
+          target_date?: string | null
           target_weight_kg?: number | null
         }
         Update: {
@@ -295,6 +297,7 @@ export type Database = {
           id?: string
           onboarding_completed?: boolean
           phone?: string | null
+          target_date?: string | null
           target_weight_kg?: number | null
         }
         Relationships: []
