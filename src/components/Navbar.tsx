@@ -38,7 +38,11 @@ export const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-3 font-outfit text-xl md:text-2xl font-bold text-foreground hover:text-primary transition-colors">
-            <img src={nourishLogo} alt="Nourish Logo" className="h-10 w-10" />
+            <img 
+              src={nourishLogo} 
+              alt="Nourish Logo" 
+              className="h-10 w-10 transition-transform duration-300 hover:scale-110 hover:rotate-6" 
+            />
             Nourish With Sam
           </Link>
 
