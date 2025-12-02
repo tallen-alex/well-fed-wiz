@@ -172,60 +172,117 @@ export function ClientMessages() {
   }
 
   return (
-    <>
-      {/* Messages List */}
-      <div className="flex-1 overflow-y-auto space-y-3 max-h-[200px] pr-2">
-        {messages.length === 0 ? (
-          <div className="text-center py-8 text-sm text-muted-foreground">
-            No messages yet. Send a message to Samira!
-          </div>
-        ) : (
-          messages.map((message) => {
-            const isSentByMe = message.sender_id === user?.id;
-            return (
+    <div className="flex-1 overflow-y-auto space-y-3 pr-2">
+      {messages.length === 0 ? (
+        <div className="text-center py-8 text-sm text-muted-foreground">
+          No messages yet. Send a message to Samira!
+        </div>
+      ) : (
+        messages.map((message) => {
+          const isSentByMe = message.sender_id === user?.id;
+          return (
+            <div
+              key={message.id}
+              className={`flex ${isSentByMe ? "justify-end" : "justify-start"}`}
+            >
               <div
-                key={message.id}
-                className={`flex ${isSentByMe ? "justify-end" : "justify-start"}`}
+                className={`max-w-[80%] rounded-lg p-3 ${
+                  isSentByMe
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted"
+                }`}
               >
-                <div
-                  className={`max-w-[80%] rounded-lg p-3 ${
-                    isSentByMe
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
-                  }`}
-                >
-                  <p className="text-sm whitespace-pre-wrap break-words">
-                    {message.message}
-                  </p>
-                  <p className={`text-xs mt-1 ${isSentByMe ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-                    {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
-                  </p>
-                </div>
+                <p className="text-sm whitespace-pre-wrap break-words">
+                  {message.message}
+                </p>
+                <p className={`text-xs mt-1 ${isSentByMe ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
+                  {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
+                </p>
               </div>
-            );
-          })
-        )}
-        <div ref={messagesEndRef} />
-      </div>
+            </div>
+          );
+        })
+      )}
+      <div ref={messagesEndRef} />
+    </div>
+  );
+}
 
-      {/* Message Input */}
-      <form onSubmit={handleSendMessage} className="flex gap-2 mt-3">
-        <Input
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type a message..."
-          disabled={sending}
-          maxLength={2000}
-          className="flex-1"
-        />
-        <Button
-          type="submit"
-          size="icon"
-          disabled={sending || !newMessage.trim()}
-        >
-          <Send className="h-4 w-4" />
-        </Button>
-      </form>
-    </>
+export function ClientMessageInput() {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [newMessage, setNewMessage] = useState("");
+  const [sending, setSending] = useState(false);
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!newMessage.trim()) {
+      return;
+    }
+
+    setSending(true);
+
+    try {
+      // Get admin ID
+      const { data: adminRole, error: roleError } = await supabase
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "admin")
+        .limit(1)
+        .maybeSingle();
+
+      if (roleError) {
+        throw roleError;
+      }
+
+      if (!adminRole) {
+        toast({
+          title: "Setup Required",
+          description: "No admin account found. Please contact support or create an admin account first.",
+          variant: "destructive",
+        });
+        setSending(false);
+        return;
+      }
+
+      const { error } = await supabase.from("messages").insert({
+        sender_id: user?.id,
+        recipient_id: adminRole.user_id,
+        message: newMessage.trim(),
+      });
+
+      if (error) throw error;
+
+      setNewMessage("");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send message",
+        variant: "destructive",
+      });
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSendMessage} className="flex gap-2">
+      <Input
+        value={newMessage}
+        onChange={(e) => setNewMessage(e.target.value)}
+        placeholder="Type a message..."
+        disabled={sending}
+        maxLength={2000}
+        className="flex-1"
+      />
+      <Button
+        type="submit"
+        size="icon"
+        disabled={sending || !newMessage.trim()}
+      >
+        <Send className="h-4 w-4" />
+      </Button>
+    </form>
   );
 }

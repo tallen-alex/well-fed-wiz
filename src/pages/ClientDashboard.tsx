@@ -12,7 +12,7 @@ import { Navbar } from "@/components/Navbar";
 import { AppointmentBooking } from "@/components/AppointmentBooking";
 import { AppointmentsList } from "@/components/AppointmentsList";
 import { TodaysMealPlan } from "@/components/TodaysMealPlan";
-import { ClientMessages } from "@/components/ClientMessages";
+import { ClientMessages, ClientMessageInput } from "@/components/ClientMessages";
 import { ClientOnboarding } from "@/components/ClientOnboarding";
 import { WeightJourneyGraph } from "@/components/WeightJourneyGraph";
 import { AchievementBadges } from "@/components/AchievementBadges";
@@ -207,8 +207,11 @@ export default function ClientDashboard() {
                       </CardTitle>
                       <CardDescription>Chat with Samira</CardDescription>
                     </CardHeader>
-                    <CardContent className="flex-1">
-                      <ClientMessages />
+                    <CardContent className="flex-1 flex flex-col gap-4">
+                      <div className="flex-1 max-h-[260px]">
+                        <ClientMessages />
+                      </div>
+                      <ClientMessageInput />
                     </CardContent>
                   </Card>
                 </div>
