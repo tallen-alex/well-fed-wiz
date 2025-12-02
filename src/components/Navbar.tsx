@@ -49,20 +49,22 @@ export const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <a href="#services" className="text-foreground hover:text-primary transition-colors">
-              Services
-            </a>
-            <a href="#about" className="text-foreground hover:text-primary transition-colors">
-              About
-            </a>
-            <a href="#testimonials" className="text-foreground hover:text-primary transition-colors">
-              Testimonials
-            </a>
-            <a href="#contact" className="text-foreground hover:text-primary transition-colors">
-              Contact
-            </a>
-          </div>
+          {!user && (
+            <div className="hidden md:flex items-center space-x-8">
+              <a href="#services" className="text-foreground hover:text-primary transition-colors">
+                Services
+              </a>
+              <a href="#about" className="text-foreground hover:text-primary transition-colors">
+                About
+              </a>
+              <a href="#testimonials" className="text-foreground hover:text-primary transition-colors">
+                Testimonials
+              </a>
+              <a href="#contact" className="text-foreground hover:text-primary transition-colors">
+                Contact
+              </a>
+            </div>
+          )}
 
           {/* Auth Buttons / User Menu */}
           <div className="hidden md:flex items-center space-x-4">
@@ -117,19 +119,23 @@ export const Navbar = () => {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden py-4 space-y-4 border-t border-border">
-            <a href="#services" className="block text-foreground hover:text-primary transition-colors">
-              Services
-            </a>
-            <a href="#about" className="block text-foreground hover:text-primary transition-colors">
-              About
-            </a>
-            <a href="#testimonials" className="block text-foreground hover:text-primary transition-colors">
-              Testimonials
-            </a>
-            <a href="#contact" className="block text-foreground hover:text-primary transition-colors">
-              Contact
-            </a>
-            <div className="pt-4 border-t border-border space-y-2">
+            {!user && (
+              <>
+                <a href="#services" className="block text-foreground hover:text-primary transition-colors">
+                  Services
+                </a>
+                <a href="#about" className="block text-foreground hover:text-primary transition-colors">
+                  About
+                </a>
+                <a href="#testimonials" className="block text-foreground hover:text-primary transition-colors">
+                  Testimonials
+                </a>
+                <a href="#contact" className="block text-foreground hover:text-primary transition-colors">
+                  Contact
+                </a>
+              </>
+            )}
+            <div className={!user ? "pt-4 border-t border-border space-y-2" : "space-y-2"}>
               {user ? (
                 <>
                   <p className="text-sm font-medium text-foreground">

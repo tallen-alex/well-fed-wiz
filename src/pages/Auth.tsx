@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -24,9 +24,20 @@ export default function Auth() {
   const [fullName, setFullName] = useState("");
   const [selectedRole, setSelectedRole] = useState<"admin" | "client">("client");
   
-  const { signIn, signUp, signInWithGoogle, resetPassword } = useAuth();
+  const { signIn, signUp, signInWithGoogle, resetPassword, user, role } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Redirect to dashboard after successful login
+  useEffect(() => {
+    if (user && role) {
+      if (role === "admin") {
+        navigate("/admin-dashboard");
+      } else {
+        navigate("/client-dashboard");
+      }
+    }
+  }, [user, role, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
