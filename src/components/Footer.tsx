@@ -7,7 +7,7 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
             <h3 className="font-outfit font-bold text-xl mb-4 text-foreground">
-              NutriBalance
+              Nourish With Sam
             </h3>
             <p className="text-muted-foreground">
               Expert nutrition guidance for a healthier, balanced life.
@@ -46,7 +46,7 @@ export const Footer = () => {
         </div>
         
         <div className="border-t border-border pt-8 text-center text-muted-foreground flex items-center justify-center gap-2">
-          <span>© 2024 NutriBalance. Made with</span>
+          <span>© 2025 Nourish With Sam. Made with</span>
           <Heart className="h-4 w-4 text-primary fill-primary" />
           <span>for your health.</span>
         </div>
