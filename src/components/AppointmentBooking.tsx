@@ -70,6 +70,43 @@ export const AppointmentBooking = ({ open, onOpenChange, onSuccess }: Appointmen
 
       if (error) throw error;
 
+      // Send email notification to admin
+      try {
+        // Get admin email and client profile
+        const { data: adminRoles } = await supabase
+          .from("user_roles")
+          .select("user_id")
+          .eq("role", "admin")
+          .limit(1)
+          .single();
+
+        const { data: clientProfile } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", user.id)
+          .single();
+
+        if (adminRoles?.user_id) {
+          const { data: adminUser } = await supabase.auth.admin.getUserById(adminRoles.user_id);
+          
+          if (adminUser?.user?.email) {
+            await supabase.functions.invoke("send-appointment-request-notification", {
+              body: {
+                adminEmail: adminUser.user.email,
+                clientName: clientProfile?.full_name || user.user_metadata?.full_name || "A client",
+                clientEmail: user.email || "",
+                appointmentDate: format(selectedDate, "yyyy-MM-dd"),
+                appointmentTime: selectedTime,
+                clientNotes: notes || undefined,
+              },
+            });
+          }
+        }
+      } catch (emailError) {
+        console.error("Failed to send admin notification:", emailError);
+        // Don't fail the whole operation if email fails
+      }
+
       toast({
         title: "Appointment Requested",
         description: "Your consultation request has been submitted. Sam will confirm shortly!",

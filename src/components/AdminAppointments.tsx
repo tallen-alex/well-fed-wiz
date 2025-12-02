@@ -102,6 +102,31 @@ export const AdminAppointments = () => {
 
       if (error) throw error;
 
+      // Send email notification when confirming appointment
+      if (status === "confirmed") {
+        try {
+          const appointment = appointments.find(a => a.id === id);
+          if (appointment) {
+            const { data: authUser } = await supabase.auth.admin.getUserById(appointment.client_id);
+            
+            if (authUser?.user?.email) {
+              await supabase.functions.invoke("send-appointment-notification", {
+                body: {
+                  clientEmail: authUser.user.email,
+                  clientName: appointment.clientName,
+                  appointmentDate: appointment.appointment_date,
+                  appointmentTime: appointment.appointment_time,
+                  notes: notes || undefined,
+                },
+              });
+            }
+          }
+        } catch (emailError) {
+          console.error("Failed to send email notification:", emailError);
+          // Don't fail the whole operation if email fails
+        }
+      }
+
       toast({
         title: "Appointment Updated",
         description: `Appointment has been ${status}.`,
