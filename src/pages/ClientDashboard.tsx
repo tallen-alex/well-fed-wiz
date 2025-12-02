@@ -12,6 +12,7 @@ import { Navbar } from "@/components/Navbar";
 import { AppointmentBooking } from "@/components/AppointmentBooking";
 import { AppointmentsList } from "@/components/AppointmentsList";
 import { ClientMealPlans } from "@/components/ClientMealPlans";
+import { ClientMessages } from "@/components/ClientMessages";
 import { Calendar, MessageSquare, UtensilsCrossed, User } from "lucide-react";
 
 export default function ClientDashboard() {
@@ -169,6 +170,13 @@ export default function ClientDashboard() {
               Your Appointments
             </h2>
             <AppointmentsList clientId={user?.id || ""} refresh={appointmentsRefresh} />
+          </div>
+
+          <div className="mb-8">
+            <h2 className="font-outfit text-2xl font-bold text-foreground mb-4">
+              Messages from Your Nutritionist
+            </h2>
+            <ClientMessages />
           </div>
 
           <div id="meal-plans" className="mb-8">
