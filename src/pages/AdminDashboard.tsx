@@ -18,7 +18,10 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Navbar } from "@/components/Navbar";
 import { AdminAppointments } from "@/components/AdminAppointments";
-import { Users, TrendingUp, Calendar } from "lucide-react";
+import { MealPlansList } from "@/components/MealPlansList";
+import { MealPlanEditor } from "@/components/MealPlanEditor";
+import { AssignMealPlan } from "@/components/AssignMealPlan";
+import { Users, TrendingUp, Calendar, UtensilsCrossed } from "lucide-react";
 
 interface Client {
   id: string;
@@ -34,6 +37,10 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [clients, setClients] = useState<Client[]>([]);
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [assignOpen, setAssignOpen] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+  const [mealPlansRefresh, setMealPlansRefresh] = useState(0);
   const [profile, setProfile] = useState({
     full_name: "",
     bio: "",
@@ -181,10 +188,14 @@ export default function AdminDashboard() {
           </div>
 
           <Tabs defaultValue="appointments" className="mb-8">
-            <TabsList className="grid w-full grid-cols-2 max-w-md">
+            <TabsList className="grid w-full grid-cols-3 max-w-2xl">
               <TabsTrigger value="appointments">
                 <Calendar className="h-4 w-4 mr-2" />
                 Appointments
+              </TabsTrigger>
+              <TabsTrigger value="meal-plans">
+                <UtensilsCrossed className="h-4 w-4 mr-2" />
+                Meal Plans
               </TabsTrigger>
               <TabsTrigger value="clients">
                 <Users className="h-4 w-4 mr-2" />
@@ -194,6 +205,24 @@ export default function AdminDashboard() {
             
             <TabsContent value="appointments" className="mt-6">
               <AdminAppointments />
+            </TabsContent>
+
+            <TabsContent value="meal-plans" className="mt-6">
+              <MealPlansList
+                onCreateNew={() => {
+                  setSelectedPlanId(null);
+                  setEditorOpen(true);
+                }}
+                onEdit={(planId) => {
+                  setSelectedPlanId(planId);
+                  setEditorOpen(true);
+                }}
+                onAssign={(planId) => {
+                  setSelectedPlanId(planId);
+                  setAssignOpen(true);
+                }}
+                refresh={mealPlansRefresh}
+              />
             </TabsContent>
 
             <TabsContent value="clients">
@@ -233,6 +262,20 @@ export default function AdminDashboard() {
               </Card>
             </TabsContent>
           </Tabs>
+
+          <MealPlanEditor
+            planId={selectedPlanId || undefined}
+            open={editorOpen}
+            onOpenChange={setEditorOpen}
+            onSuccess={() => setMealPlansRefresh(prev => prev + 1)}
+          />
+
+          <AssignMealPlan
+            mealPlanId={selectedPlanId}
+            open={assignOpen}
+            onOpenChange={setAssignOpen}
+            onSuccess={() => setMealPlansRefresh(prev => prev + 1)}
+          />
 
           <Card>
             <CardHeader>

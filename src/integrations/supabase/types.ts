@@ -53,6 +53,171 @@ export type Database = {
         }
         Relationships: []
       }
+      client_meal_plans: {
+        Row: {
+          assigned_by: string | null
+          client_id: string
+          created_at: string | null
+          end_date: string | null
+          id: string
+          meal_plan_id: string
+          notes: string | null
+          start_date: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_by?: string | null
+          client_id: string
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          meal_plan_id: string
+          notes?: string | null
+          start_date: string
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_by?: string | null
+          client_id?: string
+          created_at?: string | null
+          end_date?: string | null
+          id?: string
+          meal_plan_id?: string
+          notes?: string | null
+          start_date?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_meal_plans_meal_plan_id_fkey"
+            columns: ["meal_plan_id"]
+            isOneToOne: false
+            referencedRelation: "meal_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meal_plan_days: {
+        Row: {
+          created_at: string | null
+          day_number: number
+          id: string
+          meal_plan_id: string
+          notes: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          day_number: number
+          id?: string
+          meal_plan_id: string
+          notes?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          day_number?: number
+          id?: string
+          meal_plan_id?: string
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meal_plan_days_meal_plan_id_fkey"
+            columns: ["meal_plan_id"]
+            isOneToOne: false
+            referencedRelation: "meal_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meal_plan_meals: {
+        Row: {
+          calories: number | null
+          carbs_grams: number | null
+          created_at: string | null
+          description: string | null
+          fat_grams: number | null
+          id: string
+          ingredients: string | null
+          instructions: string | null
+          meal_name: string
+          meal_plan_day_id: string
+          meal_type: string
+          protein_grams: number | null
+        }
+        Insert: {
+          calories?: number | null
+          carbs_grams?: number | null
+          created_at?: string | null
+          description?: string | null
+          fat_grams?: number | null
+          id?: string
+          ingredients?: string | null
+          instructions?: string | null
+          meal_name: string
+          meal_plan_day_id: string
+          meal_type: string
+          protein_grams?: number | null
+        }
+        Update: {
+          calories?: number | null
+          carbs_grams?: number | null
+          created_at?: string | null
+          description?: string | null
+          fat_grams?: number | null
+          id?: string
+          ingredients?: string | null
+          instructions?: string | null
+          meal_name?: string
+          meal_plan_day_id?: string
+          meal_type?: string
+          protein_grams?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meal_plan_meals_meal_plan_day_id_fkey"
+            columns: ["meal_plan_day_id"]
+            isOneToOne: false
+            referencedRelation: "meal_plan_days"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meal_plans: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          description: string | null
+          duration_days: number
+          id: string
+          is_template: boolean | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          description?: string | null
+          duration_days?: number
+          id?: string
+          is_template?: boolean | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          description?: string | null
+          duration_days?: number
+          id?: string
+          is_template?: boolean | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

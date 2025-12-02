@@ -6,10 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Navbar } from "@/components/Navbar";
 import { AppointmentBooking } from "@/components/AppointmentBooking";
 import { AppointmentsList } from "@/components/AppointmentsList";
+import { ClientMealPlans } from "@/components/ClientMealPlans";
 import { Calendar, MessageSquare, UtensilsCrossed, User } from "lucide-react";
 
 export default function ClientDashboard() {
@@ -118,7 +120,7 @@ export default function ClientDashboard() {
               </CardContent>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+            <Card className="hover:shadow-lg transition-shadow">
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <UtensilsCrossed className="mr-2 h-5 w-5 text-primary" />
@@ -127,7 +129,9 @@ export default function ClientDashboard() {
                 <CardDescription>View your personalized meal plans</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" className="w-full">View Meal Plans</Button>
+                <Button variant="outline" className="w-full" asChild>
+                  <a href="#meal-plans">View Meal Plans</a>
+                </Button>
               </CardContent>
             </Card>
 
@@ -165,6 +169,13 @@ export default function ClientDashboard() {
               Your Appointments
             </h2>
             <AppointmentsList clientId={user?.id || ""} refresh={appointmentsRefresh} />
+          </div>
+
+          <div id="meal-plans" className="mb-8">
+            <h2 className="font-outfit text-2xl font-bold text-foreground mb-4">
+              Your Meal Plans
+            </h2>
+            <ClientMealPlans />
           </div>
 
           <Card>
