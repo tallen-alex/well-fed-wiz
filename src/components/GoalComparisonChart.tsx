@@ -438,7 +438,7 @@ export function GoalComparisonChart({ weightHistory, startWeight, targetWeight, 
               <div>
                 <p className="font-semibold text-foreground">Adjust Your Approach</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  You're currently behind the ideal pace. Consider reviewing your meal plan and activity level with your nutritionist to get back on track.
+                  You're currently behind the ideal pace. Consider reviewing your meal plan and activity level with Samira to get back on track.
                 </p>
               </div>
             </div>

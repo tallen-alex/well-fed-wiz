@@ -9,7 +9,7 @@ export const About = () => {
           <div className="animate-in fade-in slide-in-from-left-8 duration-1000">
             <img 
               src={aboutImage} 
-              alt="Nutritionist consultation" 
+              alt="Samira consultation" 
               className="rounded-3xl shadow-2xl w-full h-auto object-cover"
             />
           </div>

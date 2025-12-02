@@ -82,7 +82,7 @@ export function ClientMessages() {
         read: msg.read,
         created_at: msg.created_at,
         sender: {
-          full_name: profileMap.get(msg.sender_id)?.full_name || "Sam (Nutritionist)",
+          full_name: profileMap.get(msg.sender_id)?.full_name || "Samira",
         },
       })) || [];
 
@@ -133,7 +133,7 @@ export function ClientMessages() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Messages from Your Nutritionist</CardTitle>
+              <CardTitle>Messages from Samira</CardTitle>
               <CardDescription>
                 {unreadCount > 0
                   ? `You have ${unreadCount} unread message${unreadCount > 1 ? "s" : ""}`
@@ -201,7 +201,7 @@ export function ClientMessages() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
-              {selectedMessage?.subject || "Message from Your Nutritionist"}
+              {selectedMessage?.subject || "Message from Samira"}
             </DialogTitle>
             <DialogDescription>
               From {selectedMessage?.sender.full_name} •{" "}

@@ -12,6 +12,7 @@ import { Navbar } from "@/components/Navbar";
 import { AppointmentBooking } from "@/components/AppointmentBooking";
 import { AppointmentsList } from "@/components/AppointmentsList";
 import { TodaysMealPlan } from "@/components/TodaysMealPlan";
+import { SendMessage } from "@/components/SendMessage";
 import { ClientMessages } from "@/components/ClientMessages";
 import { ClientOnboarding } from "@/components/ClientOnboarding";
 import { WeightJourneyGraph } from "@/components/WeightJourneyGraph";
@@ -134,6 +135,10 @@ export default function ClientDashboard() {
     }
   };
 
+  const getFirstName = (fullName: string) => {
+    return fullName.split(" ")[0];
+  };
+
   return (
     <div className="min-h-screen bg-background relative">
       <div 
@@ -161,7 +166,7 @@ export default function ClientDashboard() {
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-4xl mx-auto">
             <h1 className="font-outfit text-4xl font-bold text-foreground mb-2">
-              Welcome back, {profile.full_name || "Client"}!
+              Welcome back, {profile.full_name ? getFirstName(profile.full_name) : "Client"}!
             </h1>
             <p className="text-muted-foreground mb-8">
               Here&apos;s your personalized nutrition dashboard
@@ -178,7 +183,7 @@ export default function ClientDashboard() {
 
               <TabsContent value="overview" className="space-y-6 mt-6">
                 <div className="grid md:grid-cols-2 gap-6">
-                  <Card className="hover:shadow-lg transition-shadow backdrop-blur-sm bg-card/95">
+                  <Card className="hover:shadow-lg transition-shadow backdrop-blur-sm bg-card/95 flex flex-col">
                     <CardHeader>
                       <CardTitle className="flex items-center">
                         <Calendar className="mr-2 h-5 w-5 text-primary" />
@@ -186,23 +191,26 @@ export default function ClientDashboard() {
                       </CardTitle>
                       <CardDescription>Schedule your next session</CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="flex-1 flex items-end">
                       <Button className="w-full" onClick={() => setBookingOpen(true)}>
                         Schedule Appointment
                       </Button>
                     </CardContent>
                   </Card>
 
-                  <Card className="hover:shadow-lg transition-shadow backdrop-blur-sm bg-card/95">
+                  <Card className="hover:shadow-lg transition-shadow backdrop-blur-sm bg-card/95 flex flex-col">
                     <CardHeader>
                       <CardTitle className="flex items-center">
                         <MessageSquare className="mr-2 h-5 w-5 text-primary" />
                         Messages
                       </CardTitle>
-                      <CardDescription>Check updates from your nutritionist</CardDescription>
+                      <CardDescription>Check updates from Samira</CardDescription>
                     </CardHeader>
-                    <CardContent>
-                      <ClientMessages />
+                    <CardContent className="flex-1 flex flex-col gap-3">
+                      <div className="flex-1">
+                        <ClientMessages />
+                      </div>
+                      <SendMessage />
                     </CardContent>
                   </Card>
                 </div>
