@@ -3,8 +3,29 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
-import { Utensils, Flame, Beef, Cookie, Droplet } from "lucide-react";
+import { Flame, Beef, Cookie, Droplet, Coffee, Sun, Moon, Apple, Edit, Trash2, UtensilsCrossed } from "lucide-react";
 
 interface MealLog {
   id: string;
@@ -25,8 +46,18 @@ interface MealHistoryProps {
 
 export function MealHistory({ refresh }: MealHistoryProps) {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [meals, setMeals] = useState<MealLog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editingMeal, setEditingMeal] = useState<MealLog | null>(null);
+  const [deletingMealId, setDeletingMealId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({
+    meal_name: "",
+    calories: 0,
+    protein_grams: 0,
+    carbs_grams: 0,
+    fat_grams: 0,
+  });
   const [stats, setStats] = useState({
     totalCalories: 0,
     totalProtein: 0,
@@ -39,6 +70,18 @@ export function MealHistory({ refresh }: MealHistoryProps) {
       fetchMeals();
     }
   }, [user, refresh]);
+
+  useEffect(() => {
+    if (editingMeal) {
+      setEditForm({
+        meal_name: editingMeal.meal_name,
+        calories: editingMeal.calories || 0,
+        protein_grams: editingMeal.protein_grams || 0,
+        carbs_grams: editingMeal.carbs_grams || 0,
+        fat_grams: editingMeal.fat_grams || 0,
+      });
+    }
+  }, [editingMeal]);
 
   const fetchMeals = async () => {
     try {
@@ -76,21 +119,86 @@ export function MealHistory({ refresh }: MealHistoryProps) {
     }
   };
 
-  const getMealTypeEmoji = (type: string) => {
-    switch (type) {
-      case 'breakfast': return '🌅';
-      case 'lunch': return '☀️';
-      case 'dinner': return '🌙';
-      case 'snack': return '🍪';
-      default: return '🍽️';
+  const handleEditMeal = async () => {
+    if (!editingMeal) return;
+
+    try {
+      const { error } = await supabase
+        .from("meal_logs")
+        .update({
+          meal_name: editForm.meal_name,
+          calories: editForm.calories,
+          protein_grams: editForm.protein_grams,
+          carbs_grams: editForm.carbs_grams,
+          fat_grams: editForm.fat_grams,
+        })
+        .eq("id", editingMeal.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Meal updated successfully",
+      });
+
+      setEditingMeal(null);
+      fetchMeals();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update meal",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteMeal = async () => {
+    if (!deletingMealId) return;
+
+    try {
+      const { error } = await supabase
+        .from("meal_logs")
+        .delete()
+        .eq("id", deletingMealId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Meal deleted successfully",
+      });
+
+      setDeletingMealId(null);
+      fetchMeals();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete meal",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getMealIcon = (mealType: string) => {
+    switch (mealType.toLowerCase()) {
+      case "breakfast":
+        return <Coffee className="h-5 w-5 text-amber-500" />;
+      case "lunch":
+        return <Sun className="h-5 w-5 text-orange-500" />;
+      case "dinner":
+        return <Moon className="h-5 w-5 text-indigo-500" />;
+      case "snack":
+        return <Apple className="h-5 w-5 text-green-500" />;
+      default:
+        return <UtensilsCrossed className="h-5 w-5 text-muted-foreground" />;
     }
   };
 
   const getMealTypeColor = (type: string) => {
-    switch (type) {
-      case 'breakfast': return 'bg-orange-500/10 text-orange-700 border-orange-500/20';
-      case 'lunch': return 'bg-blue-500/10 text-blue-700 border-blue-500/20';
-      case 'dinner': return 'bg-purple-500/10 text-purple-700 border-purple-500/20';
+    switch (type.toLowerCase()) {
+      case 'breakfast': return 'bg-amber-500/10 text-amber-700 border-amber-500/20';
+      case 'lunch': return 'bg-orange-500/10 text-orange-700 border-orange-500/20';
+      case 'dinner': return 'bg-indigo-500/10 text-indigo-700 border-indigo-500/20';
       case 'snack': return 'bg-green-500/10 text-green-700 border-green-500/20';
       default: return 'bg-gray-500/10 text-gray-700 border-gray-500/20';
     }
@@ -105,7 +213,7 @@ export function MealHistory({ refresh }: MealHistoryProps) {
       {/* Daily Stats */}
       <Card className="backdrop-blur-sm bg-card/95">
         <CardHeader>
-          <CardTitle>Today's Nutrition</CardTitle>
+          <CardTitle>Today's Nutrition Summary</CardTitle>
           <CardDescription>{format(new Date(), "EEEE, MMMM d, yyyy")}</CardDescription>
         </CardHeader>
         <CardContent>
@@ -138,15 +246,15 @@ export function MealHistory({ refresh }: MealHistoryProps) {
       <Card className="backdrop-blur-sm bg-card/95">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Utensils className="h-5 w-5" />
+            <UtensilsCrossed className="h-5 w-5" />
             Meal History
           </CardTitle>
-          <CardDescription>Your meals logged today</CardDescription>
+          <CardDescription>Your meals logged today (including meal plan completions)</CardDescription>
         </CardHeader>
         <CardContent>
           {meals.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              <Utensils className="h-12 w-12 mx-auto mb-3 opacity-50" />
+              <UtensilsCrossed className="h-12 w-12 mx-auto mb-3 opacity-50" />
               <p>No meals logged yet today</p>
               <p className="text-sm mt-1">Start tracking your nutrition!</p>
             </div>
@@ -158,8 +266,8 @@ export function MealHistory({ refresh }: MealHistoryProps) {
                   className="p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
                 >
                   <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl">{getMealTypeEmoji(meal.meal_type)}</span>
+                    <div className="flex items-center gap-3">
+                      {getMealIcon(meal.meal_type)}
                       <div>
                         <h3 className="font-semibold text-foreground">{meal.meal_name}</h3>
                         <p className="text-xs text-muted-foreground">
@@ -167,9 +275,27 @@ export function MealHistory({ refresh }: MealHistoryProps) {
                         </p>
                       </div>
                     </div>
-                    <Badge className={getMealTypeColor(meal.meal_type)}>
-                      {meal.meal_type}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge className={getMealTypeColor(meal.meal_type)}>
+                        {meal.meal_type}
+                      </Badge>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setEditingMeal(meal)}
+                        className="h-8 w-8 p-0"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setDeletingMealId(meal.id)}
+                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
 
                   {(meal.calories || meal.protein_grams || meal.carbs_grams || meal.fat_grams) && (
@@ -216,6 +342,86 @@ export function MealHistory({ refresh }: MealHistoryProps) {
           )}
         </CardContent>
       </Card>
+
+      {/* Edit Dialog */}
+      <Dialog open={!!editingMeal} onOpenChange={() => setEditingMeal(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Meal</DialogTitle>
+            <DialogDescription>Update the meal details below</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Meal Name</Label>
+              <Input
+                value={editForm.meal_name}
+                onChange={(e) => setEditForm({ ...editForm, meal_name: e.target.value })}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Calories</Label>
+                <Input
+                  type="number"
+                  value={editForm.calories}
+                  onChange={(e) => setEditForm({ ...editForm, calories: parseInt(e.target.value) || 0 })}
+                />
+              </div>
+              <div>
+                <Label>Protein (g)</Label>
+                <Input
+                  type="number"
+                  value={editForm.protein_grams}
+                  onChange={(e) => setEditForm({ ...editForm, protein_grams: parseFloat(e.target.value) || 0 })}
+                />
+              </div>
+              <div>
+                <Label>Carbs (g)</Label>
+                <Input
+                  type="number"
+                  value={editForm.carbs_grams}
+                  onChange={(e) => setEditForm({ ...editForm, carbs_grams: parseFloat(e.target.value) || 0 })}
+                />
+              </div>
+              <div>
+                <Label>Fat (g)</Label>
+                <Input
+                  type="number"
+                  value={editForm.fat_grams}
+                  onChange={(e) => setEditForm({ ...editForm, fat_grams: parseFloat(e.target.value) || 0 })}
+                />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={handleEditMeal}>Save Changes</Button>
+              <Button variant="outline" onClick={() => setEditingMeal(null)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Dialog */}
+      <AlertDialog open={!!deletingMealId} onOpenChange={() => setDeletingMealId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Meal?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete this meal log. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteMeal}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
