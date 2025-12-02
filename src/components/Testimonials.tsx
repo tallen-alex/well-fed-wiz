@@ -24,7 +24,7 @@ const testimonials = [
 
 export const Testimonials = () => {
   return (
-    <section className="py-24 bg-accent-gradient">
+    <section id="testimonials" className="py-24 bg-accent-gradient">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16 animate-in fade-in slide-in-from-bottom-4 duration-1000">
           <h2 className="font-outfit text-4xl md:text-5xl font-bold mb-4 text-foreground">

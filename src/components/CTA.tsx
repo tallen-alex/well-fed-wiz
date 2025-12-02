@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Calendar } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const CTA = () => {
   return (
-    <section className="py-24 bg-primary text-primary-foreground relative overflow-hidden">
+    <section id="contact" className="py-24 bg-primary text-primary-foreground relative overflow-hidden">
       <div className="absolute inset-0 bg-hero-gradient opacity-90" />
       
       <div className="container mx-auto px-4 relative z-10">
@@ -19,10 +20,13 @@ export const CTA = () => {
             <Button 
               size="lg"
               variant="secondary"
+              asChild
               className="font-outfit text-lg px-8 py-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
             >
-              <Calendar className="mr-2 h-5 w-5" />
-              Schedule Free Consultation
+              <Link to="/auth">
+                <Calendar className="mr-2 h-5 w-5" />
+                Schedule Free Consultation
+              </Link>
             </Button>
             <Button 
               size="lg"

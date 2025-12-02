@@ -14,9 +14,9 @@ export const About = () => {
             />
           </div>
           
-          <div className="animate-in fade-in slide-in-from-right-8 duration-1000">
+          <div id="about" className="animate-in fade-in slide-in-from-right-8 duration-1000">
             <h2 className="font-outfit text-4xl md:text-5xl font-bold mb-6 text-foreground">
-              Meet Your Nutritionist
+              Meet Sam
             </h2>
             <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
               With over 10 years of experience in nutrition science and wellness coaching, 
