@@ -174,7 +174,7 @@ export function ClientMessages() {
   return (
     <div className="flex flex-col h-full">
       {/* Messages List */}
-      <div className="flex-1 overflow-y-auto space-y-3 mb-3 max-h-[300px] pr-2">
+      <div className="flex-1 overflow-y-auto space-y-3 mb-3 max-h-[200px] pr-2">
         {messages.length === 0 ? (
           <div className="text-center py-8 text-sm text-muted-foreground">
             No messages yet. Send a message to Samira!

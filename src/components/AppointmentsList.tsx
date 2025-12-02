@@ -222,7 +222,7 @@ export const AppointmentsList = ({ clientId, refresh }: AppointmentsListProps) =
 
   return (
     <>
-      <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+      <div className="space-y-4 max-h-[200px] overflow-y-auto pr-2">
         {appointments.map((appointment) => (
           <Card key={appointment.id}>
             <CardHeader className="pb-3">
