@@ -32,6 +32,8 @@ export const TodaysMealPlan = ({ onMealCompleted }: TodaysMealPlanProps) => {
   const [todaysMeals, setTodaysMeals] = useState<MealPlanMeal[]>([]);
   const [completedMeals, setCompletedMeals] = useState<Set<string>>(new Set());
   const [planTitle, setPlanTitle] = useState("");
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [currentDay, setCurrentDay] = useState(1);
 
   useEffect(() => {
     if (user) {
@@ -58,18 +60,21 @@ export const TodaysMealPlan = ({ onMealCompleted }: TodaysMealPlanProps) => {
       }
 
       setPlanTitle((assignments.meal_plans as any).title);
-      const startDate = new Date(assignments.start_date);
+      const planStartDate = new Date(assignments.start_date);
+      setStartDate(planStartDate);
       const today = startOfDay(new Date());
-      const daysSinceStart = differenceInDays(today, startOfDay(startDate));
-      const currentDayNumber = daysSinceStart + 1;
+      const daysSinceStart = differenceInDays(today, startOfDay(planStartDate));
+      let currentDayNumber = daysSinceStart + 1;
 
-      // Check if we're within the plan duration
-      if (currentDayNumber < 1 || currentDayNumber > (assignments.meal_plans as any).duration_days) {
-        setLoading(false);
-        return;
+      // If plan hasn't started yet, show Day 1
+      // If plan has ended, show the last day
+      if (currentDayNumber < 1) {
+        currentDayNumber = 1;
+      } else if (currentDayNumber > (assignments.meal_plans as any).duration_days) {
+        currentDayNumber = (assignments.meal_plans as any).duration_days;
       }
 
-      // Fetch today's meals
+      // Fetch today's/current day's meals
       const { data: dayData, error: dayError } = await supabase
         .from("meal_plan_days")
         .select("id, meal_plan_meals(*)")
@@ -83,6 +88,7 @@ export const TodaysMealPlan = ({ onMealCompleted }: TodaysMealPlanProps) => {
       }
 
       setTodaysMeals((dayData.meal_plan_meals as any) || []);
+      setCurrentDay(currentDayNumber);
 
       // Fetch completed meals
       const todayStr = format(today, "yyyy-MM-dd");
@@ -172,8 +178,36 @@ export const TodaysMealPlan = ({ onMealCompleted }: TodaysMealPlanProps) => {
   }
 
   if (todaysMeals.length === 0) {
-    return null;
+    return (
+      <Card className="backdrop-blur-sm bg-card/95 border-primary/20">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-primary" />
+                Your Meal Plan
+              </CardTitle>
+              <CardDescription>{planTitle}</CardDescription>
+            </div>
+            {startDate && startDate > new Date() && (
+              <Badge variant="secondary">
+                Starts {format(startDate, "MMM d, yyyy")}
+              </Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground text-center py-4">
+            No meals planned for Day {currentDay}
+          </p>
+        </CardContent>
+      </Card>
+    );
   }
+
+  const today = startOfDay(new Date());
+  const isUpcoming = startDate && startDate > today;
+  const isPast = startDate && differenceInDays(today, startDate) >= 3; // Plan ended
 
   return (
     <Card className="backdrop-blur-sm bg-card/95 border-primary/20">
@@ -182,13 +216,27 @@ export const TodaysMealPlan = ({ onMealCompleted }: TodaysMealPlanProps) => {
           <div>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5 text-primary" />
-              Today's Meal Plan
+              {isUpcoming ? "Upcoming Meal Plan" : isPast ? "Recent Meal Plan" : "Today's Meal Plan"}
             </CardTitle>
-            <CardDescription>{planTitle}</CardDescription>
+            <CardDescription>
+              {planTitle} • Day {currentDay}
+            </CardDescription>
           </div>
-          <Badge variant="default">
-            {completedMeals.size} / {todaysMeals.length} completed
-          </Badge>
+          <div className="flex items-center gap-2">
+            {isUpcoming && startDate && (
+              <Badge variant="secondary">
+                Starts {format(startDate, "MMM d")}
+              </Badge>
+            )}
+            {isPast && (
+              <Badge variant="outline">Completed</Badge>
+            )}
+            {!isUpcoming && !isPast && (
+              <Badge variant="default">
+                {completedMeals.size} / {todaysMeals.length} completed
+              </Badge>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
