@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { Mail, MailOpen, Send } from "lucide-react";
 
 interface Message {
@@ -198,7 +198,7 @@ export function ClientMessages() {
                     {message.message}
                   </p>
                   <p className={`text-xs mt-1 ${isSentByMe ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-                    {format(new Date(message.created_at), "MMM d, h:mm a")}
+                    {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
                   </p>
                 </div>
               </div>
