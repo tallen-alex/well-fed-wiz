@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Menu, X, LogOut } from "lucide-react";
+import nourishLogo from "@/assets/nourish-logo.png";
 
 export const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -36,7 +37,8 @@ export const Navbar = () => {
     <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="font-outfit text-xl md:text-2xl font-bold text-foreground hover:text-primary transition-colors">
+          <Link to="/" className="flex items-center gap-3 font-outfit text-xl md:text-2xl font-bold text-foreground hover:text-primary transition-colors">
+            <img src={nourishLogo} alt="Nourish Logo" className="h-10 w-10" />
             Nourish With Sam
           </Link>
 
