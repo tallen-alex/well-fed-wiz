@@ -9,8 +9,12 @@ export const About = () => {
           <div className="animate-in fade-in slide-in-from-left-8 duration-1000">
             <img 
               src={aboutImage} 
-              alt="Samira consultation" 
-              className="rounded-3xl shadow-2xl w-full h-auto object-cover"
+              alt="Samira - Nutrition Expert" 
+              className="rounded-2xl w-full h-auto object-cover shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_40px_rgb(0,0,0,0.16)] transition-shadow duration-300"
+              style={{
+                filter: 'brightness(1.02) contrast(1.05)',
+                boxShadow: '0 0 60px rgba(var(--primary), 0.15), 0 8px 30px rgba(0, 0, 0, 0.12)'
+              }}
             />
           </div>
           
