@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +27,7 @@ export function ClientMessages() {
   const [loading, setLoading] = useState(true);
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (user) {
@@ -34,6 +35,11 @@ export function ClientMessages() {
       subscribeToMessages();
     }
   }, [user]);
+
+  useEffect(() => {
+    // Auto-scroll to bottom when messages change
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const subscribeToMessages = () => {
     const channel = supabase
@@ -199,6 +205,7 @@ export function ClientMessages() {
             );
           })
         )}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Message Input */}
