@@ -119,15 +119,25 @@ export function ClientMessages() {
 
     try {
       // Get admin ID
-      const { data: adminRole } = await supabase
+      const { data: adminRole, error: roleError } = await supabase
         .from("user_roles")
         .select("user_id")
         .eq("role", "admin")
         .limit(1)
-        .single();
+        .maybeSingle();
+
+      if (roleError) {
+        throw roleError;
+      }
 
       if (!adminRole) {
-        throw new Error("Could not find admin");
+        toast({
+          title: "Setup Required",
+          description: "No admin account found. Please contact support or create an admin account first.",
+          variant: "destructive",
+        });
+        setSending(false);
+        return;
       }
 
       const { error } = await supabase.from("messages").insert({
