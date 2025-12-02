@@ -36,6 +36,7 @@ export default function ClientDashboard() {
     height_cm: null as number | null,
     current_weight_kg: null as number | null,
     target_weight_kg: null as number | null,
+    target_date: null as string | null,
     onboarding_completed: false,
   });
   const [weightHistory, setWeightHistory] = useState<Array<{ recorded_date: string; weight_kg: number }>>([]);
@@ -66,7 +67,7 @@ export default function ClientDashboard() {
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .select("full_name, phone, dietary_goals, age, height_cm, current_weight_kg, target_weight_kg, onboarding_completed")
+        .select("full_name, phone, dietary_goals, age, height_cm, current_weight_kg, target_weight_kg, target_date, onboarding_completed")
         .eq("id", user?.id)
         .maybeSingle();
 
@@ -81,6 +82,7 @@ export default function ClientDashboard() {
           height_cm: data.height_cm,
           current_weight_kg: data.current_weight_kg,
           target_weight_kg: data.target_weight_kg,
+          target_date: data.target_date,
           onboarding_completed: data.onboarding_completed,
         });
 
@@ -360,6 +362,9 @@ export default function ClientDashboard() {
                   weightHistory={weightHistory}
                   startWeight={weightHistory.length > 0 ? weightHistory[0].weight_kg : profile.current_weight_kg || undefined}
                   targetWeight={profile.target_weight_kg || undefined}
+                  targetDate={profile.target_date ? new Date(profile.target_date) : undefined}
+                  userId={user?.id}
+                  onTargetDateUpdate={fetchProfile}
                 />
                 <AchievementBadges 
                   weightHistory={weightHistory}
